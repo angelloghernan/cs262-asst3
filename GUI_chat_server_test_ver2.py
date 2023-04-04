@@ -89,6 +89,7 @@ def runServer():
         conn_name_map.update({conn:name})
         name_conn_map.update({name:conn})
         name_loggedin.update({name:1})
+        updateDatabase()
 
         # Debugging message, or show list if desired on the server's end
         # print(conn_name_map)
@@ -173,6 +174,7 @@ def serve_client(conn, addr):
             del name_conn_map[n]
     print("conn is close and the name_conn_map is",name_conn_map)
     name_loggedin.update({sender_name:0})
+    updateDatabase()
     # Close the connection and beware that the socket cannot be reused
     conn.send("GODIE".encode(FORMAT))
     conn.close()
@@ -206,6 +208,7 @@ def broadcastMessageFromTo(sender,message,name):
                     message_list = ["\n Below is the list of unread messages\n"]
                     message_list.append(message.decode(FORMAT))
                     name_message_map.update({name:message_list})
+                    updateDatabase()
                     print("successfully added to ", name)
                     return "successfully added to " + name
                 elif(name in name_message_map.keys()):
