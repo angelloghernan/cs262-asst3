@@ -12,7 +12,8 @@ import os
 PORT = 65432
 # An IPv4 address is obtained for the server.
 # SERVER = socket.gethostbyname(socket.gethostname())
-SERVER = "134.209.220.140"
+# SERVER = "134.209.220.140"
+SERVER = input("Please enter the IP to start this server on:")
 # Address is stored as a tuple
 ADDRESS = (SERVER, PORT)
 # the format in which encoding and decoding will occur
@@ -59,17 +60,19 @@ def loadDatabase():
     global name_conn_map
     global name_message_map
     global name_loggedin
-    with open("files/serverdb.pickle", "rb") as database_file:
-        db = pickle.load(database_file)
-        names = db[0]
-        conn_name_map = db[1]
-        name_conn_map = db[2]
-        name_message_map = db[3]
-        name_loggedin = db[4]
+    try:
+        with open("files/serverdb.pickle", "rb") as database_file:
+            db = pickle.load(database_file)
+            names = db[0]
+            conn_name_map = db[1]
+            name_conn_map = db[2]
+            name_message_map = db[3]
+            name_loggedin = db[4]
+    except:
+        pass
 
 # Start the connection
 def runServer():
-
     print("server is working on s" + SERVER)
     server.listen()
 
