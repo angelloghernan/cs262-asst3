@@ -263,6 +263,8 @@ def exhaust_name_message_map(name, conn): # Conn is the socket
             except BrokenPipeError:
                 break
 
+# Receive pickled data format first by reading the length of the pickled data
+# and then by reading the amount of bytes in the message
 def receive_pickled_data(sock: socket.socket):
     received_data = b''
     size = int(sock.recv(4096).decode(FORMAT))
@@ -270,6 +272,8 @@ def receive_pickled_data(sock: socket.socket):
         received_data += sock.recv(4096)
     return pickle.loads(received_data)
 
+# Send pickled data format first by sending the length of the pickled data
+# and then by reading the amount of bytes in the message
 def send_pickled_data(sock: socket.socket):
     data = package_data()
     serialized_data = pickle.dumps(data)
@@ -322,6 +326,7 @@ def server_listen(address: str, port: int) -> None:
             print("Error listening to another server: ", str(e))
 
 def server_connect(address: str, port: int) -> None:
+    sock = None
     while True:
         try:
             sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -357,7 +362,8 @@ def server_connect(address: str, port: int) -> None:
         except Exception as e:
             print(str(e))
             print(f"Connection failed for {address}:{port}, trying again in 3 seconds")
-            sock.close()
+            if sock:
+                sock.close()
             time.sleep(3)
 
 
