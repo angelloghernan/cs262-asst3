@@ -18,6 +18,8 @@ FORMAT = "utf-8"
 # Can be changed into using database
 names = []
 # Bi-directional mapping between socket and name 
+conn_name_map = dict()
+name_conn_map = dict()
 # Message buffer for not logged-in but registeredusers
 name_message_map = dict() # A map from a username to a list of messages
 # keep track of registered users and their state of connectedness
