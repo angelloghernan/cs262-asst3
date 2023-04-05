@@ -87,8 +87,8 @@ def loadDatabase():
             db = pickle.load(database_file)
             print("loaded: ", db)
             unpackage_data(db)
-    except:
-        print("could not load database")
+    except Exception as e:
+        print("could not load database: ", str(e))
         pass
 
 # Start the connection
@@ -369,11 +369,10 @@ if __name__ == "__main__":
     # TODO try to connect to the other servers and then request information from them if possible
     for (i, (address, port, should_connect)) in enumerate(servers):
         if should_connect:
-            thread = threading.Thread(target=server_connect)
-            pass
+            thread = threading.Thread(target=server_connect, args=(address, port))
+            thread.start()
         else:
-            thread = threading.Thread(target=server_listen,
-                                      args=(ip_address, port))
+            thread = threading.Thread(target=server_listen, args=(ip_address, port))
             thread.start()
 
     ADDRESS = (SERVER, PORT)
