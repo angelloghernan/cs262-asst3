@@ -299,9 +299,11 @@ def server_listen(address: str, port: int) -> None:
             while True:
                 try:
                     time.sleep(2)
-                    sock.recv(4096)
+                    conn.recv(4096)
                 except:
                     print("Lost connection with another server")
+                    sock.close()
+                    break
         except:
             print("Error listening to another server, closed connection")
 
@@ -326,6 +328,8 @@ def server_connect(address: str, port: int) -> None:
                     sock.send("HEARTBEAT".encode(FORMAT))
                 except:
                     print("Lost connection with another server")
+                    sock.close()
+                    break
         except:
             print("Connection failed for {address}:{port}, trying again in 3 seconds")
             time.sleep(2)
@@ -365,7 +369,7 @@ if __name__ == "__main__":
     # TODO try to connect to the other servers and then request information from them if possible
     for (i, (address, port, should_connect)) in enumerate(servers):
         if should_connect:
-            thread = threading.Thread(target=)
+            thread = threading.Thread(target=server_connect)
             pass
         else:
             thread = threading.Thread(target=server_listen,
