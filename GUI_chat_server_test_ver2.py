@@ -3,6 +3,8 @@ import threading
 import pickle
 import tempfile
 import os
+import time
+import calendar
 # SSH root@134.209.220.140
 # Password: HFY82305791HFY
 # ufw allow 65432 in cloud server
@@ -32,23 +34,22 @@ servers = []
 server_sockets = []
 server_name = ""
 
+last_written_timestamp = None
+
 # Testing
 # name_message_map.update({"Huang":["This is the buffer message from before for Huang\n","Yes please"]})
 # name_message_map.update({"Xie":["This is the buffer message for Xie\n","I love myself"]})
 
-def updateDatabase():
-    save = [names, conn_name_map, name_conn_map, name_message_map, 
-            name_loggedin, ip_address, servers]
+def get_timestamp():
+    gmt = time.gmtime()
+    return calendar.timegm(gmt)
 
-    print(save)
-    # Update the db atomically
-    with tempfile.NamedTemporaryFile(mode='wb', delete=False) as temp:
-        pickle.dump(save, temp)
-        temp.flush()
-        os.replace(temp.name, f"files/serverdb{server_name}.pickle")
-        print("Updated database")
+def package_data():
+    timestamp = get_timestamp()
+    return [names, conn_name_map, name_conn_map, name_message_map, 
+            name_loggedin, ip_address, servers, timestamp]
 
-def loadDatabase():
+def unpackage_data(db):
     global names
     global conn_name_map
     global name_conn_map
@@ -56,17 +57,36 @@ def loadDatabase():
     global name_loggedin
     global ip_address
     global servers
+    global last_written_timestamp
+    names = db[0]
+    conn_name_map = db[1]
+    name_conn_map = db[2]
+    name_message_map = db[3]
+    name_loggedin = db[4]
+    ip_address = db[5]
+    servers = db[6]
+    last_written_timestamp = db[7]
+
+
+def updateDatabase():
+    global last_written_timestamp
+    saved_data = package_data()
+
+    print(saved_data)
+    # Update the db atomically
+    with tempfile.NamedTemporaryFile(mode='wb', delete=False) as temp:
+        pickle.dump(saved_data, temp)
+        temp.flush()
+        os.replace(temp.name, f"files/serverdb{server_name}.pickle")
+        print("Updated database")
+        last_written_timestamp = saved_data[7]
+
+def loadDatabase():
     try:
         with open(f"files/serverdb{server_name}.pickle", "rb") as database_file:
             db = pickle.load(database_file)
-            names = db[0]
-            conn_name_map = db[1]
-            name_conn_map = db[2]
-            name_message_map = db[3]
-            name_loggedin = db[4]
-            ip_address = db[5]
-            servers = db[6]
             print("loaded: ", db)
+            unpackage_data(db)
     except:
         print("could not load database")
         pass
@@ -236,6 +256,69 @@ def exhaust_name_message_map(name, conn): # Conn is the socket
             except BrokenPipeError:
                 break
 
+def receive_pickled_data(sock: socket.socket):
+    received_data = b''
+    while True:
+        data = sock.recv(4096)
+        try:
+            data_decoded = data.decode(FORMAT)
+            if data_decoded == "FINISH":
+                break
+        except:
+            received_data += data
+    return pickle.loads(received_data)
+
+def send_pickled_data(sock: socket.socket):
+    sock.send("SENDING".encode(FORMAT))
+    sock.recv(1024) # wait for ack
+    data = package_data()
+    serialized_data = pickle.dumps(data)
+    sock.sendall(serialized_data)
+    sock.send("FINISH".encode(FORMAT))
+
+def server_listen(address: str, port: int) -> None:
+    while True:
+        try:
+            sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+            sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR, 1)
+            sock.bind((address, port))
+            sock.listen()
+            conn, _ = sock.accept()
+            # First message: timestamp, sent by other end
+            timestamp = int(conn.recv(1024).decode(FORMAT))
+            if last_written_timestamp is None or timestamp > last_written_timestamp:
+                sock.send("REQUEST".encode(FORMAT))
+                sock.recv(4096) # wait for ack
+                data = receive_pickled_data(conn)
+                unpackage_data(data)
+                updateDatabase()
+            elif timestamp < last_written_timestamp:
+                sock.send("SENDING".encode(FORMAT))
+                sock.recv(4096) # wait for ack
+                send_pickled_data(conn)
+        except:
+            print("Error listening to another server")
+
+def server_connect(address: str, port, int) -> None:
+    while True:
+        try:
+            sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+            sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR, 1)
+            sock.connect((address, port))
+            sock.send(str(get_timestamp).encode(FORMAT))
+            response = sock.recv(4096).decode(FORMAT)
+            sock.send("ACK".encode(FORMAT))
+            if response == "REQUEST":
+                send_pickled_data(sock)
+            else:
+                data = receive_pickled_data(sock)
+                unpackage_data(data)
+                updateDatabase()
+        except:
+            print("Connection failed for {address}:{port}, trying again in 3 seconds")
+            time.sleep(3000)
+
+
 if __name__ == "__main__":
     server_name = input("What is this server's name/identity?: ")
 
@@ -261,9 +344,21 @@ if __name__ == "__main__":
             break
         other_port = input("Please enter the port this connection will use: ")
         other_port = int(other_port)
-        servers.append((other_address, other_port))
+
+        should_connect = input("Should this server connect to this address (instead of listening for it)?: [Y/n]")
+        should_connect = should_connect != "n" and should_connect != "N"
+
+        servers.append((other_address, other_port, should_connect))
 
     # TODO try to connect to the other servers and then request information from them if possible
+    for (i, (address, port, should_connect)) in enumerate(servers):
+        if should_connect:
+            thread = threading.Thread(target=)
+            pass
+        else:
+            thread = threading.Thread(target=server_listen,
+                                      args=(ip_address, port))
+            thread.start()
 
     ADDRESS = (SERVER, PORT)
     # Create a socket that accepts connection
