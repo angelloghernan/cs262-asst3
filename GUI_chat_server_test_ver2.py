@@ -49,7 +49,7 @@ def package_data():
     return [names, conn_name_map, name_conn_map, name_message_map, 
             name_loggedin, ip_address, servers, timestamp]
 
-def unpackage_data(db):
+def unpackage_data(db, update_servers=False):
     global names
     global conn_name_map
     global name_conn_map
@@ -63,30 +63,35 @@ def unpackage_data(db):
     name_conn_map = db[2]
     name_message_map = db[3]
     name_loggedin = db[4]
-    ip_address = db[5]
-    servers = db[6]
+    if update_servers:
+        ip_address = db[5]
+        servers = db[6]
     last_written_timestamp = db[7]
 
 
-def updateDatabase():
+def updateDatabase(updateTimestamp=True):
     global last_written_timestamp
     saved_data = package_data()
 
+    if not updateTimestamp:
+        saved_data[7] = last_written_timestamp
+
     print(saved_data)
     # Update the db atomically
-    with tempfile.NamedTemporaryFile(mode='wb', delete=False) as temp:
+    with tempfile.NamedTemporaryFile(prefix=server_name, mode='wb', delete=False) as temp:
         pickle.dump(saved_data, temp)
         temp.flush()
         os.replace(temp.name, f"files/serverdb{server_name}.pickle")
         print("Updated database")
-        last_written_timestamp = saved_data[7]
+        if updateTimestamp:
+            last_written_timestamp = saved_data[7]
 
 def loadDatabase():
     try:
         with open(f"files/serverdb{server_name}.pickle", "rb") as database_file:
             db = pickle.load(database_file)
             print("loaded: ", db)
-            unpackage_data(db)
+            unpackage_data(db, update_servers=True)
     except Exception as e:
         print("could not load database: ", str(e))
         pass
@@ -99,6 +104,8 @@ def runServer(SERVER: str, server_socket: socket.socket):
     while True:
         # Everytime it accepts creates a new socket to handle the connection
         conn, addr = server.accept()
+
+        print("Accepting connection from client")
         
         conn.send("NAME".encode(FORMAT)) # Ask the client: what is your name?
 
@@ -258,81 +265,100 @@ def exhaust_name_message_map(name, conn): # Conn is the socket
 
 def receive_pickled_data(sock: socket.socket):
     received_data = b''
-    while True:
-        data = sock.recv(4096)
-        try:
-            data_decoded = data.decode(FORMAT)
-            if data_decoded == "FINISH":
-                break
-        except:
-            received_data += data
+    size = int(sock.recv(4096).decode(FORMAT))
+    while len(received_data) < size:
+        received_data += sock.recv(4096)
     return pickle.loads(received_data)
 
 def send_pickled_data(sock: socket.socket):
-    sock.send("SENDING".encode(FORMAT))
-    sock.recv(1024) # wait for ack
     data = package_data()
     serialized_data = pickle.dumps(data)
+    sock.send(str(len(serialized_data)).encode(FORMAT))
     sock.sendall(serialized_data)
     sock.send("FINISH".encode(FORMAT))
 
 def server_listen(address: str, port: int) -> None:
+    sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR, 1)
+    sock.bind((address, port))
     while True:
         try:
-            sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-            sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR, 1)
-            sock.bind((address, port))
             sock.listen()
             conn, _ = sock.accept()
             # First message: timestamp, sent by other end
             timestamp = int(conn.recv(1024).decode(FORMAT))
+            print("Timestamp received: ", timestamp)
             if last_written_timestamp is None or timestamp > last_written_timestamp:
-                sock.send("REQUEST".encode(FORMAT))
-                sock.recv(4096) # wait for ack
+                print("Updating database...")
+                conn.send("REQUEST".encode(FORMAT))
+                conn.recv(4096) # wait for ack
+                print("Updating database...")
                 data = receive_pickled_data(conn)
                 unpackage_data(data)
+                print("Updating database...")
                 updateDatabase()
+                conn.send("OK".encode(FORMAT))
             elif timestamp < last_written_timestamp:
-                sock.send("SENDING".encode(FORMAT))
-                sock.recv(4096) # wait for ack
+                print("Sending information...")
+                conn.send("SENDING".encode(FORMAT))
+                print("Sending information...")
+                conn.recv(4096) # wait for ack
+                print("Sending information...")
                 send_pickled_data(conn)
+                conn.recv(4096) # get ack
             while True:
                 try:
                     time.sleep(2)
-                    conn.recv(4096)
+                    print("Listening for heartbeat...")
+                    hb = conn.recv(4096).decode(FORMAT)
+                    if not hb == "HEARTBEAT":
+                        print("Lost connection with another server")
+                        break
+                    print("Heart beat received: ", hb)
                 except:
                     print("Lost connection with another server")
-                    sock.close()
                     break
-        except:
-            print("Error listening to another server, closed connection")
+        except Exception as e:
+            print("Error listening to another server: ", str(e))
 
 def server_connect(address: str, port: int) -> None:
     while True:
         try:
             sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
             sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR, 1)
+            print("Trying to connect to server")
             sock.connect((address, port))
-            sock.send(str(get_timestamp).encode(FORMAT))
+            print("Connection established")
+            sock.send(str(last_written_timestamp).encode(FORMAT))
             response = sock.recv(4096).decode(FORMAT)
+            print("Response received: ", response)
             sock.send("ACK".encode(FORMAT))
+            print("Sent ACK")
             if response == "REQUEST":
+                print("Sending information...")
                 send_pickled_data(sock)
+                sock.recv(4096) # get ack
             else:
+                print("Receiving information...")
                 data = receive_pickled_data(sock)
                 unpackage_data(data)
                 updateDatabase()
+                print("Sending ACK (OK)")
+                sock.send("OK".encode(FORMAT))
             while True:
                 try:
                     time.sleep(2)
+                    print("Sending heartbeat...")
                     sock.send("HEARTBEAT".encode(FORMAT))
                 except:
                     print("Lost connection with another server")
                     sock.close()
                     break
-        except:
-            print("Connection failed for {address}:{port}, trying again in 3 seconds")
-            time.sleep(2)
+        except Exception as e:
+            print(str(e))
+            print(f"Connection failed for {address}:{port}, trying again in 3 seconds")
+            sock.close()
+            time.sleep(3)
 
 
 if __name__ == "__main__":
@@ -381,5 +407,5 @@ if __name__ == "__main__":
     server.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR, 1)
     server.bind(ADDRESS)
     ip_address = SERVER
-    updateDatabase()
+    updateDatabase(updateTimestamp=False)
     runServer(SERVER, server)
