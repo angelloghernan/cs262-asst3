@@ -9,13 +9,6 @@ import os
 # ufw allowimport socket
 # HOST = "134.209.220.140"
 
-PORT = 65432
-# An IPv4 address is obtained for the server.
-# SERVER = socket.gethostbyname(socket.gethostname())
-# SERVER = "134.209.220.140"
-SERVER = input("Please enter the IP to start this server on:")
-# Address is stored as a tuple
-ADDRESS = (SERVER, PORT)
 # the format in which encoding and decoding will occur
 FORMAT = "utf-8"
 
@@ -31,28 +24,29 @@ name_conn_map = dict()
 name_message_map = dict() # A map from a username to a list of messages
 # keep track of registered users and their state of connectedness
 name_loggedin = dict()
+ip_address = None
+
+servers = []
+
+# not persistent, do not save
+server_sockets = []
+server_name = ""
 
 # Testing
 # name_message_map.update({"Huang":["This is the buffer message from before for Huang\n","Yes please"]})
 # name_message_map.update({"Xie":["This is the buffer message for Xie\n","I love myself"]})
 
-# Create a socket that accepts connection
-server=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-server.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR, 1)
-server.bind(ADDRESS)
-
 def updateDatabase():
-    save = [names, conn_name_map, name_conn_map, name_message_map, name_loggedin]
+    save = [names, conn_name_map, name_conn_map, name_message_map, 
+            name_loggedin, ip_address, servers]
+
+    print(save)
     # Update the db atomically
     with tempfile.NamedTemporaryFile(mode='wb', delete=False) as temp:
-        # Pickle the data to the temporary file
         pickle.dump(save, temp)
-
-        # Flush the data to the file
         temp.flush()
-
-        # Atomically move the temporary file to the final destination
-        os.replace(temp.name, "files/serverdb.pickle")
+        os.replace(temp.name, f"files/serverdb{server_name}.pickle")
+        print("Updated database")
 
 def loadDatabase():
     global names
@@ -60,24 +54,29 @@ def loadDatabase():
     global name_conn_map
     global name_message_map
     global name_loggedin
+    global ip_address
+    global servers
     try:
-        with open("files/serverdb.pickle", "rb") as database_file:
+        with open(f"files/serverdb{server_name}.pickle", "rb") as database_file:
             db = pickle.load(database_file)
             names = db[0]
             conn_name_map = db[1]
             name_conn_map = db[2]
             name_message_map = db[3]
             name_loggedin = db[4]
+            ip_address = db[5]
+            servers = db[6]
+            print("loaded: ", db)
     except:
+        print("could not load database")
         pass
 
 # Start the connection
-def runServer():
-    print("server is working on s" + SERVER)
-    server.listen()
+def runServer(SERVER: str, server_socket: socket.socket):
+    print("server is working on IP " + SERVER)
+    server_socket.listen()
 
     while True:
-        loadDatabase()
         # Everytime it accepts creates a new socket to handle the connection
         conn, addr = server.accept()
         
@@ -116,7 +115,7 @@ def runServer():
         print(f"number of connections is {threading.activeCount()-1}")
 
 # receive incoming messages and send to specified recipients
-def serve_client(conn, addr):
+def serve_client(conn: socket.socket, addr):
     print(f"NEW CONNECTION {addr}")
     connected = True
     sender_name = conn_name_map[conn]
@@ -237,5 +236,40 @@ def exhaust_name_message_map(name, conn): # Conn is the socket
             except BrokenPipeError:
                 break
 
-# Start the server
-runServer()
+if __name__ == "__main__":
+    server_name = input("What is this server's name/identity?: ")
+
+    loadDatabase()
+    PORT = 65432
+    SERVER = None
+    updated = False
+
+    if ip_address == None:
+        SERVER = input("Please enter the IP to start this server on: ")
+        ip_address = SERVER
+        updated = True
+    else:
+        SERVER = input("Please enter the IP to start this server on, or type nothing to use the previous IP: ")
+        if SERVER == "":
+            SERVER = ip_address
+
+    print(f"The following servers and ports are on record: {servers}")
+
+    while True:
+        other_address = input("Please enter the IP of another existing server, or type nothing to stop: ")
+        if other_address == "":
+            break
+        other_port = input("Please enter the port this connection will use: ")
+        other_port = int(other_port)
+        servers.append((other_address, other_port))
+
+    # TODO try to connect to the other servers and then request information from them if possible
+
+    ADDRESS = (SERVER, PORT)
+    # Create a socket that accepts connection
+    server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    server.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR, 1)
+    server.bind(ADDRESS)
+    ip_address = SERVER
+    updateDatabase()
+    runServer(SERVER, server)
