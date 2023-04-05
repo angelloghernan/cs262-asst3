@@ -14,14 +14,15 @@ import calendar
 # the format in which encoding and decoding will occur
 FORMAT = "utf-8"
 
-# Dynamically allocated arrays and dictionarys
-# Can be changed into using database
-names = []
 # Bi-directional mapping between socket and name 
 # Different client serving threads can access the global information
 conn_name_map = dict()
 name_conn_map = dict()
 
+# Dynamically allocated arrays and dictionarys
+# Can be changed into using database
+names = []
+# Bi-directional mapping between socket and name 
 # Message buffer for not logged-in but registeredusers
 name_message_map = dict() # A map from a username to a list of messages
 # keep track of registered users and their state of connectedness
@@ -46,27 +47,22 @@ def get_timestamp():
 
 def package_data():
     timestamp = get_timestamp()
-    return [names, conn_name_map, name_conn_map, name_message_map, 
-            name_loggedin, ip_address, servers, timestamp]
+    return [names, conn_name_map, name_loggedin, ip_address, servers, timestamp]
 
 def unpackage_data(db, update_servers=False):
     global names
     global conn_name_map
-    global name_conn_map
-    global name_message_map
     global name_loggedin
     global ip_address
     global servers
     global last_written_timestamp
     names = db[0]
     conn_name_map = db[1]
-    name_conn_map = db[2]
-    name_message_map = db[3]
-    name_loggedin = db[4]
+    name_loggedin = db[2]
     if update_servers:
-        ip_address = db[5]
-        servers = db[6]
-    last_written_timestamp = db[7]
+        ip_address = db[3]
+        servers = db[4]
+    last_written_timestamp = db[5]
 
 
 def updateDatabase(updateTimestamp=True):
@@ -74,7 +70,7 @@ def updateDatabase(updateTimestamp=True):
     saved_data = package_data()
 
     if not updateTimestamp:
-        saved_data[7] = last_written_timestamp
+        saved_data[5] = last_written_timestamp
 
     print(saved_data)
     # Update the db atomically
@@ -84,7 +80,7 @@ def updateDatabase(updateTimestamp=True):
         os.replace(temp.name, f"files/serverdb{server_name}.pickle")
         print("Updated database")
         if updateTimestamp:
-            last_written_timestamp = saved_data[7]
+            last_written_timestamp = saved_data[5]
 
 def loadDatabase():
     try:
