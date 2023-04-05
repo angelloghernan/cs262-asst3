@@ -398,7 +398,6 @@ if __name__ == "__main__":
 
         servers.append((other_address, other_port, should_connect))
 
-    # TODO try to connect to the other servers and then request information from them if possible
     for (i, (address, port, should_connect)) in enumerate(servers):
         if should_connect:
             thread = threading.Thread(target=server_connect, args=(address, port))
