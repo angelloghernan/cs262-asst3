@@ -296,10 +296,16 @@ def server_listen(address: str, port: int) -> None:
                 sock.send("SENDING".encode(FORMAT))
                 sock.recv(4096) # wait for ack
                 send_pickled_data(conn)
+            while True:
+                try:
+                    time.sleep(2)
+                    sock.recv(4096)
+                except:
+                    print("Lost connection with another server")
         except:
-            print("Error listening to another server")
+            print("Error listening to another server, closed connection")
 
-def server_connect(address: str, port, int) -> None:
+def server_connect(address: str, port: int) -> None:
     while True:
         try:
             sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -314,9 +320,15 @@ def server_connect(address: str, port, int) -> None:
                 data = receive_pickled_data(sock)
                 unpackage_data(data)
                 updateDatabase()
+            while True:
+                try:
+                    time.sleep(2)
+                    sock.send("HEARTBEAT".encode(FORMAT))
+                except:
+                    print("Lost connection with another server")
         except:
             print("Connection failed for {address}:{port}, trying again in 3 seconds")
-            time.sleep(3000)
+            time.sleep(2)
 
 
 if __name__ == "__main__":
