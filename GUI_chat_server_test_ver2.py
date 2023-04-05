@@ -44,7 +44,7 @@ def get_timestamp():
 
 def package_data():
     timestamp = get_timestamp()
-    return [names, name_loggedin, ip_address, servers, timestamp]
+    return [names, name_message_map, name_loggedin, ip_address, servers, timestamp]
 
 def unpackage_data(db, update_servers=False):
     global names
@@ -54,12 +54,12 @@ def unpackage_data(db, update_servers=False):
     global servers
     global last_written_timestamp
     names = db[0]
-    name_message_map = db[3]
-    name_loggedin = db[4]
+    name_message_map = db[1]
+    name_loggedin = db[2]
     if update_servers:
-        ip_address = db[5]
-        servers = db[6]
-    last_written_timestamp = db[7]
+        ip_address = db[3]
+        servers = db[4]
+    last_written_timestamp = db[5]
 
 
 def updateDatabase(updateTimestamp=True):
