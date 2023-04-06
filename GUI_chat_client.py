@@ -6,11 +6,8 @@ PORT = 65432
 server = "localhost"
 # server = "127.0.1.1"
 # server = "134.209.220.140"
-<<<<<<< HEAD
 # Albert IP: 10.250.35.148
 server = "10.250.35.148"
-=======
->>>>>>> 93f368056168828bdf8a0503c4b893d00f60e8b8
 # server = "10.29.38.26"
 address = (server, PORT)
 format = "utf-8"
