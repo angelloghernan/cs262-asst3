@@ -5,7 +5,9 @@ from tkinter import *
 
 PORT = 65432
 # server = "127.0.1.1"
-server = "134.209.220.140"
+# server = "134.209.220.140"
+# Albert IP: 10.250.35.148
+server = "10.250.35.148"
 # server = "10.29.38.26"
 address = (server, PORT)
 format = "utf-8"

@@ -67,7 +67,7 @@ def updateDatabase(updateTimestamp=True):
     saved_data = package_data()
 
     if not updateTimestamp:
-        saved_data[7] = last_written_timestamp
+        saved_data[5] = last_written_timestamp
 
     print(saved_data)
     # Update the db atomically
@@ -77,7 +77,7 @@ def updateDatabase(updateTimestamp=True):
         os.replace(temp.name, f"files/serverdb{server_name}.pickle")
         print("Updated database")
         if updateTimestamp:
-            last_written_timestamp = saved_data[7]
+            last_written_timestamp = saved_data[5]
 
 def loadDatabase():
     try:

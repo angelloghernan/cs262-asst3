@@ -1,0 +1,2 @@
+python GUI_chat_client.py
+python GUI_chat_server_test_ver2.py 
