@@ -2,13 +2,14 @@ import socket
 import threading
 from tkinter import *
 # from chat import *
-
 PORT = 65432
+server = "localhost"
 # server = "127.0.1.1"
-server = "134.209.220.140"
+# server = "134.209.220.140"
 # server = "10.29.38.26"
 address = (server, PORT)
 format = "utf-8"
+
 
 # Create a new socket
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
