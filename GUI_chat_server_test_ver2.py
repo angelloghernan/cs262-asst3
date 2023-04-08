@@ -291,6 +291,7 @@ def server_listen(address: str, port: int) -> None:
             # First message: timestamp, sent by other end
             timestamp = conn.recv(1024).decode(FORMAT)
             if timestamp is not None and (last_written_timestamp is None or timestamp > last_written_timestamp):
+                timestamp = int(timestamp)
                 print("Timestamp received: ", timestamp)
                 print("Updating database...")
                 conn.send("REQUEST".encode(FORMAT))
