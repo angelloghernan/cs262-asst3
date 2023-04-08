@@ -16,7 +16,9 @@ format = "utf-8"
 
 active_server = 0
 
-servers = ["10.250.35.148"] # NOTE: change this for the demo and whatnot. should have 2 servers
+# Albert's Window's laptop IP: "10.250.2.71"
+# Gianni's Laptop IP: "10.250.36.224"
+servers = ["10.250.2.71", "10.250.36.224"] # NOTE: change this for the demo and whatnot. should have 2 servers
 sockets: List[socket.socket] = []
 
 for server in servers:
