@@ -34,6 +34,8 @@ server_name = ""
 
 last_written_timestamp = None
 
+db_lock: threading.Lock = threading.Lock()
+
 # Testing
 # name_message_map.update({"Huang":["This is the buffer message from before for Huang\n","Yes please"]})
 # name_message_map.update({"Xie":["This is the buffer message for Xie\n","I love myself"]})
@@ -70,6 +72,9 @@ def updateDatabase(updateTimestamp=True):
         saved_data[5] = last_written_timestamp
 
     print(saved_data)
+
+    # We lock to avoid race conditions on files (GIL protects python code and data, but not I/O)
+    db_lock.acquire()
     # Update the db atomically
     with tempfile.NamedTemporaryFile(prefix=server_name, mode='wb', delete=False) as temp:
         pickle.dump(saved_data, temp)
@@ -78,6 +83,7 @@ def updateDatabase(updateTimestamp=True):
         print("Updated database")
         if updateTimestamp:
             last_written_timestamp = saved_data[5]
+    db_lock.release()
 
 def loadDatabase():
     try:
