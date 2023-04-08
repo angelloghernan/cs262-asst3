@@ -289,9 +289,9 @@ def server_listen(address: str, port: int) -> None:
             sock.listen()
             conn, _ = sock.accept()
             # First message: timestamp, sent by other end
-            timestamp = int(conn.recv(1024).decode(FORMAT))
-            print("Timestamp received: ", timestamp)
-            if last_written_timestamp is None or timestamp > last_written_timestamp:
+            timestamp = conn.recv(1024).decode(FORMAT)
+            if timestamp is not None and (last_written_timestamp is None or timestamp > last_written_timestamp):
+                print("Timestamp received: ", timestamp)
                 print("Updating database...")
                 conn.send("REQUEST".encode(FORMAT))
                 conn.recv(4096) # wait for ack
@@ -301,7 +301,7 @@ def server_listen(address: str, port: int) -> None:
                 print("Updating database...")
                 updateDatabase()
                 conn.send("OK".encode(FORMAT))
-            elif timestamp < last_written_timestamp:
+            else:
                 print("Sending information...")
                 conn.send("SENDING".encode(FORMAT))
                 print("Sending information...")
