@@ -22,7 +22,7 @@ class TestScript(unittest.TestCase):
             serialized_data = pickle.dumps(data)
 
             expected_calls = [
-                call(str(len(serialized_data)).encode("utf-8")),
+                call(len(serialized_data).to_bytes(8, byteorder='big')),
                 call("FINISH".encode("utf-8"))
             ]
             mock_conn.send.assert_has_calls(expected_calls)
@@ -45,7 +45,7 @@ class TestScript(unittest.TestCase):
             serialized_data = pickle.dumps(data)
 
             expected_calls = [
-                call(str(len(serialized_data)).encode("utf-8")),
+                call(len(serialized_data).to_bytes(8, byteorder='big')),
                 call("FINISH".encode("utf-8"))
             ]
             mock_conn.send.assert_has_calls(expected_calls)
