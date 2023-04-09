@@ -16,7 +16,7 @@ FORMAT = "utf-8"
 
 # Dynamically allocated arrays and dictionarys
 # Can be changed into using database
-names = []
+names = set()
 # Bi-directional mapping between socket and name 
 conn_name_map = dict()
 name_conn_map = dict()
@@ -46,22 +46,20 @@ def get_timestamp():
 
 def package_data():
     timestamp = get_timestamp()
-    return [names, name_message_map, name_loggedin, ip_address, servers, timestamp]
+    return [names, name_message_map, ip_address, servers, timestamp]
 
 def unpackage_data(db, update_servers=False):
     global names
     global name_message_map
-    global name_loggedin
     global ip_address
     global servers
     global last_written_timestamp
     names = db[0]
     name_message_map = db[1]
-    name_loggedin = db[2]
     if update_servers:
-        ip_address = db[3]
-        servers = db[4]
-    last_written_timestamp = db[5]
+        ip_address = db[2]
+        servers = db[3]
+    last_written_timestamp = db[4]
 
 
 def updateDatabase(updateTimestamp=True):
@@ -69,7 +67,7 @@ def updateDatabase(updateTimestamp=True):
     saved_data = package_data()
 
     if not updateTimestamp:
-        saved_data[5] = last_written_timestamp
+        saved_data[4] = last_written_timestamp
 
     print(saved_data)
 
@@ -82,7 +80,7 @@ def updateDatabase(updateTimestamp=True):
         os.replace(temp.name, f"files/serverdb{server_name}.pickle")
         print("Updated database")
         if updateTimestamp:
-            last_written_timestamp = saved_data[5]
+            last_written_timestamp = saved_data[4]
     db_lock.release()
 
 def loadDatabase():
@@ -113,7 +111,7 @@ def runServer(SERVER: str, server_socket: socket.socket):
         name = conn.recv(1024).decode(FORMAT)
 
         # Process and update all informations
-        names.append(name)
+        names.update(name)
         conn_name_map.update({conn:name})
         name_conn_map.update({name:conn})
         name_loggedin.update({name:1})
@@ -290,9 +288,8 @@ def server_listen(address: str, port: int) -> None:
             conn, _ = sock.accept()
             # First message: timestamp, sent by other end
             timestamp = conn.recv(1024).decode(FORMAT)
-            if timestamp is not None and (last_written_timestamp is None 
-                                          or int(timestamp) > last_written_timestamp):
-                timestamp = int(timestamp)
+            timestamp = 0 if timestamp == None else int(timestamp)
+            if last_written_timestamp is None or int(timestamp) > last_written_timestamp:
                 print("Timestamp received: ", timestamp)
                 print("Updating database...")
                 conn.send("REQUEST".encode(FORMAT))
