@@ -37,8 +37,7 @@ Operation: Type in “DELETE_EXIT” in the text bar
 The account record will be wiped from the server, but other clients can still register as the same name afterwards, aka, reuse the same name
 
 Feature 7: Close the application:
-Operation: Type in “EXIT” in the text bar, and then simply close the window
-Note: according to Varun, at this point, we don’t need to handle ctrl + c illegal exist in a graceful manner, though this application will not run into problem with brutal interruption and ungraceful exit.
+Operation: Type in “EXIT” in the text bar, and  then simply close the window and press Ctrl+C in the terminal.
 
 
 Reference
