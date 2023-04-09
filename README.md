@@ -6,82 +6,7 @@ This file also contains our Engineering Notebook, which is the last section.
 - Use "t9a" server to show persistence of messages between a and b on a single server.
 - Use "t13a" and "t13b" servers (port 63333, t13a on 10.250.35.148, t13b on 10.250.44.100) to show persistence of messages and replication between a and b on two servers.
 - Use t15a and higher nums for live demoing.
-
-
-
-% python GUI_chat_server_test_ver2.py            130 ↵ ✖ ✹ ✭
-What is this server's name/identity?: t14a
-could not load database:  [Errno 2] No such file or directory: 'files/serverdbt14a.pickle'
-Please enter the IP to start this server on: 10.250.35.148
-The following servers and ports are on record: []
-Please enter the IP of another existing server, or type nothing to stop: 10.250.44.100
-Please enter the port this connection will use: 63333
-Should this server connect to this address (instead of listening for it)?: [Y/n]Y
-Please enter the IP of another existing server, or type nothing to stop: 
-Trying to connect to server
-[set(), {}, '10.250.35.148', [('10.250.44.100', 63333, True)], 0]
-Updated database
-server is working on IP 10.250.35.148
-Connection established
-Response received:  SENDING
-Sent ACK
-Receiving information...
-[set(), {}, '10.250.35.148', [('10.250.44.100', 63333, True)], 1681076604]
-Updated database
-Sending ACK (OK)
-Sending heartbeat...
-
-(base) feiyang@dhcp-10-250-44-100 cs175-asst3 % python3 GUI_chat_server_test_ver2.py
-What is this server's name/identity?: t14b
-could not load database:  [Errno 2] No such file or directory: 'files/serverdbt14b.pickle'
-Please enter the IP to start this server on: 10.250.44.100
-The following servers and ports are on record: []
-Please enter the IP of another existing server, or type nothing to stop: 10.250.35.148
-Please enter the port this connection will use: 63333
-Should this server connect to this address (instead of listening for it)?: [Y/n]n
-Please enter the IP of another existing server, or type nothing to stop: 
-[set(), {}, '10.250.44.100', [('10.250.35.148', 63333, False)], 0]
-Updated database
-server is working on IP 10.250.44.100
-Sending information...
-Sending information...
-Sending information...
-Listening for heartbeat...
-Heart beat received:  HEARTBEAT
-
-
-% python GUI_chat_server_test_ver2.py            130 ↵ ✖ ✹ ✭
-What is this server's name/identity?: t13a
-loaded:  [{'b', 'a'}, {'a': ['\n Below is the list of unread messages\n', 'b: CR: a', '\nb: b2aop1\n', '\nb: b2aop2\n', '\nb: b2aop3\n']}, '10.250.35.148', [('10.250.44.100', 63333, True)], 1681076284]
-Please enter the IP to start this server on, or type nothing to use the previous IP: 
-The following servers and ports are on record: [('10.250.44.100', 63333, True)]
-Please enter the IP of another existing server, or type nothing to stop: 
-Trying to connect to server
-[{'b', 'a'}, {'a': ['\n Below is the list of unread messages\n', 'b: CR: a', '\nb: b2aop1\n', '\nb: b2aop2\n', '\nb: b2aop3\n']}, '10.250.35.148', [('10.250.44.100', 63333, True)], 1681076284]
-Updated database
-server is working on IP 10.250.35.148
-[Errno 61] Connection refused
-Connection failed for 10.250.44.100:63333, trying again in 3 seconds
-Trying to connect to server
-Connection established
-Response received:  REQUEST
-Sent ACK
-
-(base) feiyang@dhcp-10-250-44-100 cs175-asst3 % python3 GUI_chat_server_test_ver2.py
-What is this server's name/identity?: t13b
-loaded:  [{'a', 'b'}, {}, '10.250.44.100', [('10.250.35.148', 63333, False)], 1681076114]
-Please enter the IP to start this server on, or type nothing to use the previous IP: 
-The following servers and ports are on record: [('10.250.35.148', 63333, False)]
-Please enter the IP of another existing server, or type nothing to stop: 
-[{'a', 'b'}, {}, '10.250.44.100', [('10.250.35.148', 63333, False)], 1681076114]
-Updated database
-server is working on IP 10.250.44.100
-Timestamp received:  1681076284
-Updating database...
-Updating database...
-Updating database...
-[{'a', 'b'}, {'a': ['\n Below is the list of unread messages\n', 'b: CR: a', '\nb: b2aop1\n', '\nb: b2aop2\n', '\nb: b2aop3\n']}, '10.250.44.100', [('10.250.35.148', 63333, False)], 1681076429]
-Updated database
+- Demo replication, then persistence with 2 machines. 
 
 ## Chat features
 The information from design project 1 on how to perform the chat features like creating accounts and listing accounts, etc., is found in `original_chat_app_readme.txt`. That information is not relevant to this specific design project 3, so we did not include it here.
@@ -177,51 +102,44 @@ Machine 2's terminal running server on 10.250.44.100:
     Listening for heartbeat...
     Heart beat received:  HEARTBEAT
 
-### Running 2 servers on 2 different machines for the first time
-Here's an example of running 2 servers on 2 different machines for the first time. This generalizes to more servers too. 
+### Running 2 servers on 2 different machines for subsequent times
+Here's an example of running 2 servers on 2 different machines for the second time. This generalizes to more servers and subsequent times too. 
 Machine 1's terminal running server on 10.250.35.148: 
 
     % python GUI_chat_server_test_ver2.py            130 ↵ ✖ ✹ ✭
-    What is this server's name/identity?: t14a
-    could not load database:  [Errno 2] No such file or directory: 'files/serverdbt14a.pickle'
-    Please enter the IP to start this server on: 10.250.35.148
-    The following servers and ports are on record: []
-    Please enter the IP of another existing server, or type nothing to stop: 10.250.44.100
-    Please enter the port this connection will use: 63333
-    Should this server connect to this address (instead of listening for it)?: [Y/n]Y
+    What is this server's name/identity?: t13a
+    loaded:  [{'b', 'a'}, {'a': ['\n Below is the list of unread messages\n', 'b: CR: a', '\nb: b2aop1\n', '\nb: b2aop2\n', '\nb: b2aop3\n']}, '10.250.35.148', [('10.250.44.100', 63333, True)], 1681076284]
+    Please enter the IP to start this server on, or type nothing to use the previous IP: 
+    The following servers and ports are on record: [('10.250.44.100', 63333, True)]
     Please enter the IP of another existing server, or type nothing to stop: 
     Trying to connect to server
-    [set(), {}, '10.250.35.148', [('10.250.44.100', 63333, True)], 0]
+    [{'b', 'a'}, {'a': ['\n Below is the list of unread messages\n', 'b: CR: a', '\nb: b2aop1\n', '\nb: b2aop2\n', '\nb: b2aop3\n']}, '10.250.35.148', [('10.250.44.100', 63333, True)], 1681076284]
     Updated database
     server is working on IP 10.250.35.148
+    [Errno 61] Connection refused
+    Connection failed for 10.250.44.100:63333, trying again in 3 seconds
+    Trying to connect to server
     Connection established
-    Response received:  SENDING
+    Response received:  REQUEST
     Sent ACK
-    Receiving information...
-    [set(), {}, '10.250.35.148', [('10.250.44.100', 63333, True)], 1681076604]
-    Updated database
-    Sending ACK (OK)
-    Sending heartbeat...
 
 Machine 2's terminal running server on 10.250.44.100: 
 
     python3 GUI_chat_server_test_ver2.py
-    What is this server's name/identity?: t14b
-    could not load database:  [Errno 2] No such file or directory: 'files/serverdbt14b.pickle'
-    Please enter the IP to start this server on: 10.250.44.100
-    The following servers and ports are on record: []
-    Please enter the IP of another existing server, or type nothing to stop: 10.250.35.148
-    Please enter the port this connection will use: 63333
-    Should this server connect to this address (instead of listening for it)?: [Y/n]n
+    What is this server's name/identity?: t13b
+    loaded:  [{'a', 'b'}, {}, '10.250.44.100', [('10.250.35.148', 63333, False)], 1681076114]
+    Please enter the IP to start this server on, or type nothing to use the previous IP: 
+    The following servers and ports are on record: [('10.250.35.148', 63333, False)]
     Please enter the IP of another existing server, or type nothing to stop: 
-    [set(), {}, '10.250.44.100', [('10.250.35.148', 63333, False)], 0]
+    [{'a', 'b'}, {}, '10.250.44.100', [('10.250.35.148', 63333, False)], 1681076114]
     Updated database
     server is working on IP 10.250.44.100
-    Sending information...
-    Sending information...
-    Sending information...
-    Listening for heartbeat...
-    Heart beat received:  HEARTBEAT
+    Timestamp received:  1681076284
+    Updating database...
+    Updating database...
+    Updating database...
+    [{'a', 'b'}, {'a': ['\n Below is the list of unread messages\n', 'b: CR: a', '\nb: b2aop1\n', '\nb: b2aop2\n', '\nb: b2aop3\n']}, '10.250.44.100', [('10.250.35.148', 63333, False)], 1681076429]
+    Updated database
 
 
 
