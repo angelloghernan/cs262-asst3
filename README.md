@@ -1,5 +1,10 @@
 This file also contains our Engineering Notebook, which is the last section. 
 
+# About 
+We fully implemented the specification on Canvas. We took the wire protocol implementation we created for the first design exercise (the chat application) and re-design it so that the system is both persistent (it can be stopped and re-started without losing messages that were sent during the time it was running) and 2-fault tolerant in the face of crash/failstop failures. We replicated the back end of the implementation and made the message store persistent. 
+
+See "Engineering Notebook" section below for more details on the decision-making process and design.
+
 # Usage
 ## Notes for live demo purposes
 - Need to type "CR [username]" to send message specifically to [username] (which will get delivered once [username] logs in) instead of broadcasting messages to everyone (which are not delivered when [username] logs in).
@@ -147,13 +152,6 @@ Machine 2's terminal running server on 10.250.44.100:
 
 ## How to Shut Down servers and clients
 In all cases, press Ctrl+C in the terminal to shut the server down. To shut down the client, type in “EXIT” in the text bar, then simply close the window and press Ctrl+C in the corresponding terminal.
-
-
-# About 
-We fully implemented the specification on Canvas. We took the wire protocol implementation we created for the first design exercise (the chat application) and re-design it so that the system is both persistent (it can be stopped and re-started without losing messages that were sent during the time it was running) and 2-fault tolerant in the face of crash/failstop failures. We replicated the back end of the implementation and made the message store persistent. 
-
-See "Engineering Notebook" section below for more details on the decision-making process and design.
-
 
 # Testing
 To run the unit tests, simply run the command
