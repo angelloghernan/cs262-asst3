@@ -44,13 +44,8 @@ For example, if you want to re-start the server "test1" on the same IP address:
         Updated database
         server is working on IP 10.250.35.148
 
+## Running with multiple servers
 
-
-`python logical_clocks.py` or `python3 logical_clocks.py`
-
-You don't need to use pip to install any packages. This was originally wrote for and run on Python 3.9.13. 
-
-After two minutes have elapsed, the simulation will stop running automatically (no more output will be printed to the terminal or logged). 
 
 In all cases, press Ctrl+C in the terminal to shut the server down. To shut down the client, type in “EXIT” in the text bar, then simply close the window and press Ctrl+C in the terminal.
 

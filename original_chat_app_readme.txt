@@ -19,6 +19,7 @@ If input is unseen before, create an account associated with that name
 
 Feature 2: List accounts
 Operation: on users’ text bar: Type in “LIST_USERS” prints out all registered users in the application
+
 Feature 3: “Recipient Name”: Send a message to all recipients (global chat room)
 1, By default, recipient is global; or, in order to change back to global, type in “CR:”
 2, Type in messages want to send in the text bar;
