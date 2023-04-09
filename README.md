@@ -58,6 +58,7 @@ This demonstrates replication and fault-tolerance. You can run multiple servers 
 
 ### Running 2 servers on 2 different machines for the first time
 Here's an example of running 2 servers on 2 different machines for the first time. This generalizes to more servers too. 
+
 Machine 1's terminal running server on 10.250.35.148: 
 
     % python GUI_chat_server_test_ver2.py            130 ↵ ✖ ✹ ✭
@@ -104,6 +105,7 @@ Machine 2's terminal running server on 10.250.44.100:
 
 ### Running 2 servers on 2 different machines for subsequent times
 Here's an example of running 2 servers on 2 different machines for the second time. This generalizes to more servers and subsequent times too. 
+
 Machine 1's terminal running server on 10.250.35.148: 
 
     % python GUI_chat_server_test_ver2.py            130 ↵ ✖ ✹ ✭
@@ -144,7 +146,7 @@ Machine 2's terminal running server on 10.250.44.100:
 
 
 ## How to Shut Down servers and clients
-In all cases, press Ctrl+C in the terminal to shut the server down. To shut down the client, type in “EXIT” in the text bar, then simply close the window and press Ctrl+C in the terminal.
+In all cases, press Ctrl+C in the terminal to shut the server down. To shut down the client, type in “EXIT” in the text bar, then simply close the window and press Ctrl+C in the corresponding terminal.
 
 
 # About 
@@ -160,7 +162,7 @@ python FUNCTION_TO_BE_TESTED_unittest.py
 
 For example:
 
-        % python get_stamp_unittest.py                                                130 ↵ ✹
+        % python get_stamp_unittest.py                            130 ↵ ✹
         .
         ----------------------------------------------------------------------
         Ran 1 test in 0.000s
