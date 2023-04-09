@@ -88,10 +88,12 @@ There are four files to run the unit tests. The tests are conducted on presumed
 
 # Day 2: 4-6
 - We asked the questions we had and got a ton of helpful feedback.
-  - For example, we were learned that we did NOT have to implement a consensus algorithm. So, we decided NOT to implement a consensus algorithm because this is simpler and cleaner to implement, and we think this will reduce the chance of bugs occurring.
-  - We also weren't sure if we had to handle re-joining a replica that has failed. We decided to ask about this.
-  - Similarly, we had other questions about the details of the project, where we felt like there were easier ways to implement the project by strictly sticking to the specification, but we weren't sure that was okay (because some of those decisions might not be the best to use in practice, like at a real tech company). We decided to ask about this.
-- Just pickle [names, name_message_map, ip_address, servers, timestamp]
+  - For example, we were learned that we did NOT have to implement a consensus algorithm. So, we decided NOT to implement a consensus algorithm because this way would be simpler and cleaner to implement, and we think this will reduce the chance of bugs occurring.
+  - We learned that we did NOT have to handle re-joining a replica that has failed. So, we decided NOT to handle this because this way would be simpler simpler and cleaner to implement, and we think this will reduce the chance of bugs occurring.
+  - We learned that we ONLY had to implement what was specifically mentioned in the specification. So, we decided to stick to the specification and not implement anything else that wasn't mentioned in the specification. This way would be simpler and cleaner to implement, and we think this will reduce the chance of bugs occurring.
+- In particular, based on what we learned, we decided to achieve persistence by just storing all the information and data on the server in a pickle file. 
+  - We used Python pickle, a module that allows you to serialize and deserialize Python objects. Serialization is the process of converting an object in memory to a byte stream that can be stored on disk, and this allows that Python object to be saved and restored in the future via deserialization (converting a byte stream back into a Python object).
+  - We decided to pickle a list consisting of `[names, name_message_map, ip_address, servers, timestamp]` because those are all the relevant data structures we need to store to make the server persistent. Then, when we re-start the server, we just unpickle that list and restore the data structures to their previous state. We would name the pickle file after the server name 
 - We reviewed the content from class about logical clocks. 
 - We basically finished the server code this day. There were some issues getting the ordering to work correctly, involving a while True loop that would repeatedly attempt to connect the servers to each other if a connection failed (if, for example, one of the forked processes ran in the wrong order, this would lead to a failed connection).
 - We added color-coding to the terminal output to make it easier to read and understand which VM is sending/receiving messages. This was helpful for checking our code and debugging, especially for network related code.
