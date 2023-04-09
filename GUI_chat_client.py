@@ -192,6 +192,8 @@ class Client:
         while True:
             try:
                 message = client.recv(1024).decode(format)
+                # For debugging:
+                print(message)
                 # if the messages from the server is NAME send the client's name
                 if message == 'NAME':
                     client.send(self.name.encode(format))
@@ -207,13 +209,15 @@ class Client:
             except KeyboardInterrupt:
                 # an error will be printed on the command line or console if there's an error
                 client.send("DIE".encode(format))
-            except Exception:
+            except Exception as e:
                 # if there's an error, we assume the server is down. Then, we switch servers to a working one, so that we are 2-fault tolerant in the face of crash/failstop failures.
                 # naively round robin to the next server as the active server if this server is down
                 if active_server == server_no:
                     active_server += 1
                     active_server %= len(servers)
                 print(f"Error when communicating with server {server_no}, trying again in 5 seconds...")
+                # For debugging:
+                print(str(e))
                 time.sleep(5)
 
     # function to send messages
