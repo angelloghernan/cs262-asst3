@@ -15,13 +15,13 @@ import calendar
 # the format in which encoding and decoding will occur
 FORMAT = "utf-8"
 
-# Dynamically allocated arrays and dictionarys
+# Dynamically allocated arrays and dictionaries
 # Can be changed into using database
 names = []
 # Bi-directional mapping between socket and name 
 conn_name_map = dict()
 name_conn_map = dict()
-# Message buffer for not logged-in but registeredusers
+# Message buffer for not logged-in but registered users
 name_message_map = dict() # A map from a username to a list of messages
 # keep track of registered users and their state of connectedness
 name_loggedin = dict()
@@ -45,10 +45,12 @@ def get_timestamp():
     gmt = time.gmtime()
     return calendar.timegm(gmt)
 
+# Package data into a list that we can store in a database
 def package_data():
     timestamp = get_timestamp()
     return [names, name_message_map, name_loggedin, ip_address, servers, timestamp]
 
+# Load data from the database into Python variables we can use 
 def unpackage_data(db, update_servers=False):
     global names
     global name_message_map
@@ -64,7 +66,7 @@ def unpackage_data(db, update_servers=False):
         servers = db[4]
     last_written_timestamp = db[5]
 
-
+# Update the database with the current state of the server under the file serverdb{server_name}.pickle in an atomic manner to prevent race conditions
 def updateDatabase(updateTimestamp=True):
     global last_written_timestamp
     saved_data = package_data()
@@ -92,6 +94,7 @@ def loadDatabase():
             db = pickle.load(database_file)
             print("loaded: ", db)
             unpackage_data(db, update_servers=True)
+    # If the file doesn't exist, we don't need to do anything, and we can just start with an empty database
     except Exception as e:
         print("could not load database: ", str(e))
         pass
@@ -138,7 +141,7 @@ def runServer(SERVER: str, server_socket: socket.socket):
         thread = threading.Thread(target=serve_client,
                                 args=(conn, addr))
         thread.start()
-        # This is to print out the number of clients online and also for debugging such as broken pipe error and bad fiel descriptor
+        # This is to print out the number of clients online and also for debugging such as broken pipe error and bad file descriptor
         print(f"number of connections is {threading.activeCount()-1}")
 
 # receive incoming messages and send to specified recipients
