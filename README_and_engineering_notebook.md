@@ -76,14 +76,21 @@ There are four files to run the unit tests. The tests are conducted on presumed
 # Engineering Notebook
 # Day 1: 4-4
 - We needed to pick whether to use the wire protocol or gRPC version of our 1st design project. We decided to use our wire protocol implementation for the 1st design project rather than the gPRC version because we felt like the wire protocol version was cleaner, simpler, and thus more convenient to work with. We also preferred relying less on external packages/libraries to handle this because that way we feel more confident about being able to build a distributed system like this from scratch.
-- This day, we reviewed our wire protocol code for the 1st design project and reviewed sockets. 
+- This day, we reviewed our wire protocol code for the 1st design project and reviewed sockets. We played around with some code for this. 
+  - For example, we ran into a bug where the network and ports weren't working properly, and the bug turned out to be caused by our computers' firewall settings. We fixed this by turning off the firewall. 
 - We reviewed the content from class related to this design project, including material related to persistence, replication, fault tolerance, and consensus. 
+- We thought about how we would need to modify our implementation to have multiple servers to make it 2-fault tolerant. Previously, we had just 1 central server - to make it 2-fault tolerant, we would want to support 3 servers, so that if 2 of those servers failed, 1 server would still be running and useable. 
+- We also brainstormed different ways to make the message store persistent. What kind of databases would we need? We planned on doing more research and thinking on this.
 - We felt like we needed to sketch out exactly what it was we needed to do for the project (since some of the details weren't so clear), so we planned on asking questions to clarify the details.
   - For example, we weren't sure if we needed to implement a consensus algorithm or not. We decided to ask about this.
   - We also weren't sure if we had to handle re-joining a replica that has failed. We decided to ask about this.
   - Similarly, we had other questions about the details of the project, where we felt like there were easier ways to implement the project by strictly sticking to the specification, but we weren't sure that was okay (because some of those decisions might not be the best to use in practice, like at a real tech company). We decided to ask about this.
 
 # Day 2: 4-6
+- We asked the questions we had and got a ton of helpful feedback.
+  - For example, we were learned that we did NOT have to implement a consensus algorithm. So, we decided NOT to implement a consensus algorithm because this is simpler and cleaner to implement, and we think this will reduce the chance of bugs occurring.
+  - We also weren't sure if we had to handle re-joining a replica that has failed. We decided to ask about this.
+  - Similarly, we had other questions about the details of the project, where we felt like there were easier ways to implement the project by strictly sticking to the specification, but we weren't sure that was okay (because some of those decisions might not be the best to use in practice, like at a real tech company). We decided to ask about this.
 - Just pickle [names, name_message_map, ip_address, servers, timestamp]
 - We reviewed the content from class about logical clocks. 
 - We basically finished the server code this day. There were some issues getting the ordering to work correctly, involving a while True loop that would repeatedly attempt to connect the servers to each other if a connection failed (if, for example, one of the forked processes ran in the wrong order, this would lead to a failed connection).
