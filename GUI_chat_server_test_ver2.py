@@ -214,8 +214,7 @@ def serve_client(conn: socket.socket, addr):
     # We don't really have to return but this is for extended unit test concerns
     # return "serve_client_CLOSED"
 
-# method for broadcasting
-# messages to the each clients / specific client
+# method for broadcasting messages to all the clients or to a specific client, respectively
 
 def broadcastMessageAll(message):
     for conn in name_conn_map.copy().values():
