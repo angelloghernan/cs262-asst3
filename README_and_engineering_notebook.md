@@ -72,6 +72,8 @@ For example:
     
 There are four files to run the unit tests. The tests are conducted on presumed input spaces without much testing on non-benign/malicious inputs since our functions are embedded for use in parent functions. Waldo also said this is good. If desired, more test cases can be added simply by adding more test functions under the test class, though we already tested all the functionality needed for the specification.
 
+More details on the tests are in "Engineering Notebook" section below.
+
 
 # Engineering Notebook
 # Day 1: 4-4
@@ -95,16 +97,17 @@ There are four files to run the unit tests. The tests are conducted on presumed
   - We used Python pickle, a module that allows you to serialize and deserialize Python objects. Serialization is the process of converting an object in memory to a byte stream that can be stored on disk, and this allows that Python object to be saved and restored in the future via deserialization (converting a byte stream back into a Python object).
   - We decided to pickle a list consisting of `[names, name_message_map, ip_address, servers, timestamp]` because those are all the relevant data structures we need to store to make the server persistent. Then, when we re-start the server, we just unpickle that list and restore the data structures to their previous state. We would name the pickle file after the server name so that we know which pickle file to unpickle when we re-start the server.
   - Using a pickle file is much simpler and cleaner to implement than using a more complex database like MySQL or Postgres, and we think this will reduce the chance of bugs occurring. So, we are happy to just use a simple pickling and unpickling solution because this still satisfies the specification.
-- We reviewed the content from class about logical clocks. 
-- We basically finished the server code this day. There were some issues getting the ordering to work correctly, involving a while True loop that would repeatedly attempt to connect the servers to each other if a connection failed (if, for example, one of the forked processes ran in the wrong order, this would lead to a failed connection).
-- We added color-coding to the terminal output to make it easier to read and understand which VM is sending/receiving messages. This was helpful for checking our code and debugging, especially for network related code.
-- Otherwise, everything went smoothly. Compared to the first project, the details here are more well-defined, so there's less need for any rewrites. It's also all of our own code, so no need to dive into documentation beyond the pages on Python sockets and threads.
+- We then implemented the code for persistence in Python using the above strategy. We ran into some bugs with pickling and unpickling the files if the server was being run for the first (vs. not first) time, so we added some try-except clauses to check for each case and handle them separately. That fixed the bugs. 
+  - We basically finished the persistence code for a single server this day. 
 
 # Day 3: 4-8
-- Project is officially finished, besides unit testing. For unit testing, we are mostly concerned with making sure the logical clocks work correctly and sync up.
-- We also added a random seed to the program, so that we can run the program multiple times and get the same results. This is useful for testing and debugging. 
-- We used this random seed to test our program with different clock rates for each VM. We found that the logical clocks were able to sync up correctly, even with different clock rates, as desired.
-- We then studied and analyzed our program and its logs to do the analysis outlined in the specification, and put it in the below Observations section.
+- To implement the replication and 2-fault tolerance, we decided to have up to 3 servers running simultaneously, with every client sending every message to all servers, then all servers update their state based on the client's message, and then only 1 of those servers responds. We decided to use this model because it is simple and clean to implement, and we think this will reduce the chance of bugs occurring. Plus, this still satisfies the specification.
+  - Intuitively, this achieves 2-fault tolerance because if 2 of the servers fail, then 1 server will still be running and useable. Then, since the clients are communicating with all the servers, the clients will essentially not notice that 2 of the servers failed. 
+  - The servers have a designated leader, which is the server that responds to the client. The servers all send heartbeat messages between each other so every server knows the status of ever other server (whether the other server is offline or online). So, if the leader goes offline, then another server becomes the leader. So, there will always be 1 server that responds to the client, regardless of if up to 2 of the servers fail.
+  - We recognize that this model is not the most efficient or scalable model, and that this model would likely not be used in real life at a big tech company because it is infeasible for all the clients to message all the servers, but we decided to go with this model because it is simple and clean to implement while it still satisfies the specification.
+- We then implemented the code for replication and 2-fault tolerance in Python using the above strategy. We ran into some bugs with communication between the servers, but we fixed those by designating which server is listening vs actively connecting to each other. We also tested our code to make sure that it worked. 
+- We also updated our code for persistence to make sure that the data structures were being updated correctly when the servers communicate with each other. Specifically, we would have a server update their pickled data to whatever data is the most recent, which is determined by the timestamps attached to messages sent. So, if server A gets a message from server B that is more recent (newer timestamp), then server A updates its database (which is its pickle file) to match server B's newer data. Thus, we are able to achieve both persistence, replication, and 2-fault tolerance.
+- Project is officially finished, besides unit testing. We will do unit testing tomorrow.
 
 # Day 4: 4-9
 - Unit test was performed on all individual functions in the program, namely, client, server, process_events, send_message, virtual_machine.
