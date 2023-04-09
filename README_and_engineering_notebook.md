@@ -75,10 +75,13 @@ There are four files to run the unit tests. The tests are conducted on presumed
 
 # Engineering Notebook
 # Day 1: 4-4
-- Preface: We wrote our last project in C++, which was good for writing our own code but wasn't good for linking gRPC and running it, since we had to deal with cmake and incomplete/non-existent documentation.
-- Although we aren't using any libraries this time, we decided to write the project in Python since Albert and Dean aren't as familiar with C++ and this is a shorter term project (much smaller code size as well). We also wanted to see how using Python compared to using C++, and overall we liked how Python's strengths as a language in general (concise, readable, fast to write, etc.) were reflected in the project.
-- This day, we just got familiar with sockets in Python and sketched out exactly what it was we needed to do for the project (since some of the details weren't so clear).
-- We decided to have three peers connect to each other using sockets (using a pre-defined ordering and ports), with threads designated to reading from the sockets on each VM (virtual machine), otherwise nothing too special. All the other details were essentially decided by the project spec, so there's not much to note there.
+- We needed to pick whether to use the wire protocol or gRPC version of our 1st design project. We decided to use our wire protocol implementation for the 1st design project rather than the gPRC version because we felt like the wire protocol version was cleaner, simpler, and thus more convenient to work with. We also preferred relying less on external packages/libraries to handle this because that way we feel more confident about being able to build a distributed system like this from scratch.
+- This day, we reviewed our wire protocol code for the 1st design project and reviewed sockets. 
+- We reviewed the content from class related to this design project, including material related to persistence, replication, fault tolerance, and consensus. 
+- We felt like we needed to sketch out exactly what it was we needed to do for the project (since some of the details weren't so clear), so we planned on asking questions to clarify the details.
+  - For example, we weren't sure if we needed to implement a consensus algorithm or not. We decided to ask about this.
+  - We also weren't sure if we had to handle re-joining a replica that has failed. We decided to ask about this.
+  - Similarly, we had other questions about the details of the project, where we felt like there were easier ways to implement the project by strictly sticking to the specification, but we weren't sure that was okay (because some of those decisions might not be the best to use in practice, like at a real tech company). We decided to ask about this.
 
 # Day 2: 4-6
 - Just pickle [names, name_message_map, ip_address, servers, timestamp]
