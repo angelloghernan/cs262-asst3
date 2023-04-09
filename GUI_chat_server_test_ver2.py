@@ -279,7 +279,7 @@ def send_pickled_data(sock: socket.socket):
     data = package_data()
     serialized_data = pickle.dumps(data)
     # assume we aren't going over 64 bits worth of space
-    sock.send(len(serialized_data).to_bytes(8), 8)
+    sock.send(len(serialized_data).to_bytes(8, byteorder='big'), 8)
     sock.sendall(serialized_data)
     sock.send("FINISH".encode(FORMAT))
 
