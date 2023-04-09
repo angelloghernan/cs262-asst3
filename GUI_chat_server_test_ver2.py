@@ -261,7 +261,7 @@ def exhaust_name_message_map(name, conn): # Conn is the socket
     if(name in name_message_map.keys()):
         print("exhaust_name_message_map: name in name_message_map.keys()")
         for decoded_message in name_message_map[name]:
-            print("message sent from the message buffer")
+            print("message sent from the message buffer", decoded_message)
             try:
                 conn.send(decoded_message.encode(FORMAT))
             except BrokenPipeError:
