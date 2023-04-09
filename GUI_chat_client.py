@@ -3,9 +3,10 @@ import socket
 import threading
 from typing import List
 from tkinter import *
-# from chat import *
+# FOR USER: change the server IP to the IP of the server you are using, and the port to the port you are using. By default PORT = 65432 should work. 
 PORT = 65432
 server = "localhost"
+# Some information for our own reference:
 # server = "127.0.1.1"
 # server = "134.209.220.140"
 # Albert IP: 10.250.35.148
@@ -16,7 +17,11 @@ format = "utf-8"
 
 active_server = 0
 
-servers = ["10.250.35.148"] # NOTE: change this for the demo and whatnot. should have 2 servers
+# Some information for our own reference:
+# Albert's Window's laptop IP: "10.250.2.71"
+# Gianni's Laptop IP: "10.250.36.224"
+servers = ["10.250.2.71", "10.250.36.224"] # FOR USER: change this for the demo and whatnot. should have 2 servers
+servers = ["10.250.35.148"]
 sockets: List[socket.socket] = []
 
 for server in servers:
@@ -203,6 +208,7 @@ class Client:
                 # an error will be printed on the command line or console if there's an error
                 client.send("DIE".encode(format))
             except Exception:
+                # if there's an error, we assume the server is down. Then, we switch servers to a working one, so that we are 2-fault tolerant in the face of crash/failstop failures.
                 # naively round robin to the next server as the active server if this server is down
                 if active_server == server_no:
                     active_server += 1

@@ -1,3 +1,5 @@
+This is from the first design project. Some parts of this may now be slightly outdated, but the information on how to perform the chat features like creating accounts and listing accounts, etc., is still relevant. Look at the "Feature" sections here for more information.
+
 I employed LAMP server (droplet) that suffices to support such a light-volume application
 Server-side setup instruction: 
 	Cloud Server (Suggested):
@@ -17,6 +19,7 @@ If input is unseen before, create an account associated with that name
 
 Feature 2: List accounts
 Operation: on users’ text bar: Type in “LIST_USERS” prints out all registered users in the application
+
 Feature 3: “Recipient Name”: Send a message to all recipients (global chat room)
 1, By default, recipient is global; or, in order to change back to global, type in “CR:”
 2, Type in messages want to send in the text bar;
@@ -35,8 +38,7 @@ Operation: Type in “DELETE_EXIT” in the text bar
 The account record will be wiped from the server, but other clients can still register as the same name afterwards, aka, reuse the same name
 
 Feature 7: Close the application:
-Operation: Type in “EXIT” in the text bar, and then simply close the window
-Note: according to Varun, at this point, we don’t need to handle ctrl + c illegal exist in a graceful manner, though this application will not run into problem with brutal interruption and ungraceful exit.
+Operation: Type in “EXIT” in the text bar, and  then simply close the window and press Ctrl+C in the terminal.
 
 
 Reference
