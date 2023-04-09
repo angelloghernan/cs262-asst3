@@ -1,4 +1,4 @@
-This is from the first design project. Some parts of this may now be slightly outdated, but the information on how to perform the chat features like creating accounts and listing accounts, etc., is still relevant. Look at the "Feature" sections here for more information.
+This is from the first design project. Some parts of this may now be slightly outdated, but the information on how to perform the chat features like creating accounts and listing accounts, etc., is still relevant. Look at the "Feature" sections here for more information. Please read `README.md` for more information too.
 
 I employed LAMP server (droplet) that suffices to support such a light-volume application
 Server-side setup instruction: 
