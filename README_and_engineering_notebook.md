@@ -51,19 +51,26 @@ In all cases, press Ctrl+C in the terminal to shut the server down. To shut down
 
 
 # About 
-We fully implemented the specification on Canvas. We created a simulation of a small distributed system containing three machines with varying clock speeds, which can be set by a random seed. Each machine connects to each other in a pre-specified order and begins sending out messages randomly to both of its neighboring machines in the network randomly. 
-
-Each clock cycle, a machine reads its pending messages from its queue (if any) and updates its logical clock based on the logical clock number it has received from  neighboring machines. If there are none pending, it randomly may either send a message to one of the machines or both or update its own logical clock internally.
+We fully implemented the specification on Canvas. We took the wire protocol implementation we created for the first design exercise (the chat application) and re-design it so that the system is both persistent (it can be stopped and re-started without losing messages that were sent during the time it was running) and 2-fault tolerant in the face of crash/failstop failures. We replicated the back end of the implementation and made the message store persistent. 
 
 See "Engineering Notebook" section below for more details on the decision-making process and design.
 
 
 # Testing
-To run the unit test, simply run the command
+To run the unit tests, simply run the command
 
-python3 -m unittest unittest_FUNCTION_TO_BE_TESTED.py
+python FUNCTION_TO_BE_TESTED_unittest.py
+
+For example:
+
+        % python get_stamp_unittest.py                                                130 ↵ ✹
+        .
+        ----------------------------------------------------------------------
+        Ran 1 test in 0.000s
+
+        OK
     
-There are four files to run the unit test. The test is conducted on presumed input spaces without much testing on non-benign/malicious inputs since our functions are embedded for use in parent functions and the values, such as id, is typically fixed, and there is of limited significance to test most of these inputs. More test cases can be added simply by adding more test functions under the test class.
+There are four files to run the unit tests. The tests are conducted on presumed input spaces without much testing on non-benign/malicious inputs since our functions are embedded for use in parent functions. Waldo also said this is good. If desired, more test cases can be added simply by adding more test functions under the test class, though we already tested all the functionality needed for the specification.
 
 
 python GUI_chat_client.py
