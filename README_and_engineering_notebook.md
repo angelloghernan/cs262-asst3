@@ -29,6 +29,22 @@ For example, if you want to run the server "test1" on IP 10.250.35.148:
         Updated database
         server is working on IP 10.250.35.148
 
+## Running with just 1 server by re-starting previous server
+This demonstrates how it can be stopped and re-started without losing messages that were sent during the time it was running. You just run `python GUI_chat_server_test_ver2.py` or `python3 GUI_chat_server_test_ver2.py` and use the same server name as before to re-start it.
+
+For example, if you want to re-start the server "test1" on the same IP address: 
+
+        % python GUI_chat_server_test_ver2.py
+        What is this server's name/identity?: test1
+        loaded:  [[], {}, {}, '10.250.35.148', [], None]
+        Please enter the IP to start this server on, or type nothing to use the previous IP: 
+        The following servers and ports are on record: []
+        Please enter the IP of another existing server, or type nothing to stop: 
+        [[], {}, {}, '10.250.35.148', [], None]
+        Updated database
+        server is working on IP 10.250.35.148
+
+
 
 `python logical_clocks.py` or `python3 logical_clocks.py`
 
