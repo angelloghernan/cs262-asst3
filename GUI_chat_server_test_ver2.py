@@ -88,7 +88,7 @@ def updateDatabase(updateTimestamp=True):
             last_written_timestamp = saved_data[5]
     db_lock.release()
 
-# Load the database from the file corresponding to the name of this server
+# Try to load the database from the file corresponding to the name of this server if it exists, otherwise do nothing
 def loadDatabase():
     try:
         with open(f"files/serverdb{server_name}.pickle", "rb") as database_file:
@@ -383,6 +383,7 @@ def server_connect(address: str, port: int) -> None:
 if __name__ == "__main__":
     server_name = input("What is this server's name/identity?: ")
 
+    # Try to load the database from the file corresponding to this server's name
     loadDatabase()
     PORT = 65432
     SERVER = None
@@ -397,6 +398,7 @@ if __name__ == "__main__":
         if SERVER == "":
             SERVER = ip_address
 
+    # Prints an empty list if this is the first time running the server
     print(f"The following servers and ports are on record: {servers}")
 
     while True:
