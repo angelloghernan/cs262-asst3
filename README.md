@@ -114,7 +114,7 @@ For example, if you want to run the server "test1" on IP 10.250.35.148:
         server is working on IP 10.250.35.148
 
 ## Running with just 1 server by re-starting previous server
-This demonstrates how it can be stopped and re-started without losing messages that were sent during the time it was running. You just run `python GUI_chat_server_test_ver2.py` or `python3 GUI_chat_server_test_ver2.py` and use the same server name as before to re-start it.
+This demonstrates how it can be stopped and re-started without losing messages that were sent during the time it was running, AKA persistence. You just run `python GUI_chat_server_test_ver2.py` or `python3 GUI_chat_server_test_ver2.py` and use the same server name as before to re-start it.
 
 For example, if you want to re-start the server "test1" on the same IP address: 
 
@@ -129,8 +129,103 @@ For example, if you want to re-start the server "test1" on the same IP address:
         server is working on IP 10.250.35.148
 
 ## Running with multiple servers
+This demonstrates replication and fault-tolerance. You can run multiple servers on different machines and they will all be able to communicate with each other, you just need to provide the corresponding IP addresses and ports as our program prompts you to do so. You also need to provide all those IP addresses to the client. 
+
+### Running 2 servers on 2 different machines for the first time
+Here's an example of running 2 servers on 2 different machines for the first time. This generalizes to more servers too. 
+Machine 1's terminal running server on 10.250.35.148: 
+
+    % python GUI_chat_server_test_ver2.py            130 ↵ ✖ ✹ ✭
+    What is this server's name/identity?: t14a
+    could not load database:  [Errno 2] No such file or directory: 'files/serverdbt14a.pickle'
+    Please enter the IP to start this server on: 10.250.35.148
+    The following servers and ports are on record: []
+    Please enter the IP of another existing server, or type nothing to stop: 10.250.44.100
+    Please enter the port this connection will use: 63333
+    Should this server connect to this address (instead of listening for it)?: [Y/n]Y
+    Please enter the IP of another existing server, or type nothing to stop: 
+    Trying to connect to server
+    [set(), {}, '10.250.35.148', [('10.250.44.100', 63333, True)], 0]
+    Updated database
+    server is working on IP 10.250.35.148
+    Connection established
+    Response received:  SENDING
+    Sent ACK
+    Receiving information...
+    [set(), {}, '10.250.35.148', [('10.250.44.100', 63333, True)], 1681076604]
+    Updated database
+    Sending ACK (OK)
+    Sending heartbeat...
+
+Machine 2's terminal running server on 10.250.44.100: 
+
+    python3 GUI_chat_server_test_ver2.py
+    What is this server's name/identity?: t14b
+    could not load database:  [Errno 2] No such file or directory: 'files/serverdbt14b.pickle'
+    Please enter the IP to start this server on: 10.250.44.100
+    The following servers and ports are on record: []
+    Please enter the IP of another existing server, or type nothing to stop: 10.250.35.148
+    Please enter the port this connection will use: 63333
+    Should this server connect to this address (instead of listening for it)?: [Y/n]n
+    Please enter the IP of another existing server, or type nothing to stop: 
+    [set(), {}, '10.250.44.100', [('10.250.35.148', 63333, False)], 0]
+    Updated database
+    server is working on IP 10.250.44.100
+    Sending information...
+    Sending information...
+    Sending information...
+    Listening for heartbeat...
+    Heart beat received:  HEARTBEAT
+
+### Running 2 servers on 2 different machines for the first time
+Here's an example of running 2 servers on 2 different machines for the first time. This generalizes to more servers too. 
+Machine 1's terminal running server on 10.250.35.148: 
+
+    % python GUI_chat_server_test_ver2.py            130 ↵ ✖ ✹ ✭
+    What is this server's name/identity?: t14a
+    could not load database:  [Errno 2] No such file or directory: 'files/serverdbt14a.pickle'
+    Please enter the IP to start this server on: 10.250.35.148
+    The following servers and ports are on record: []
+    Please enter the IP of another existing server, or type nothing to stop: 10.250.44.100
+    Please enter the port this connection will use: 63333
+    Should this server connect to this address (instead of listening for it)?: [Y/n]Y
+    Please enter the IP of another existing server, or type nothing to stop: 
+    Trying to connect to server
+    [set(), {}, '10.250.35.148', [('10.250.44.100', 63333, True)], 0]
+    Updated database
+    server is working on IP 10.250.35.148
+    Connection established
+    Response received:  SENDING
+    Sent ACK
+    Receiving information...
+    [set(), {}, '10.250.35.148', [('10.250.44.100', 63333, True)], 1681076604]
+    Updated database
+    Sending ACK (OK)
+    Sending heartbeat...
+
+Machine 2's terminal running server on 10.250.44.100: 
+
+    python3 GUI_chat_server_test_ver2.py
+    What is this server's name/identity?: t14b
+    could not load database:  [Errno 2] No such file or directory: 'files/serverdbt14b.pickle'
+    Please enter the IP to start this server on: 10.250.44.100
+    The following servers and ports are on record: []
+    Please enter the IP of another existing server, or type nothing to stop: 10.250.35.148
+    Please enter the port this connection will use: 63333
+    Should this server connect to this address (instead of listening for it)?: [Y/n]n
+    Please enter the IP of another existing server, or type nothing to stop: 
+    [set(), {}, '10.250.44.100', [('10.250.35.148', 63333, False)], 0]
+    Updated database
+    server is working on IP 10.250.44.100
+    Sending information...
+    Sending information...
+    Sending information...
+    Listening for heartbeat...
+    Heart beat received:  HEARTBEAT
 
 
+
+## How to Shut Down servers and clients
 In all cases, press Ctrl+C in the terminal to shut the server down. To shut down the client, type in “EXIT” in the text bar, then simply close the window and press Ctrl+C in the terminal.
 
 
