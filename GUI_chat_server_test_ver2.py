@@ -100,7 +100,7 @@ def loadDatabase():
         print("could not load database: ", str(e))
         pass
 
-# Start the connection
+# Start up the server, making it handle the connection with the clients
 def runServer(SERVER: str, server_socket: socket.socket):
     print("server is working on IP " + SERVER)
     server_socket.listen()
