@@ -74,25 +74,26 @@ There are four files to run the unit tests. The tests are conducted on presumed
 
 
 # Engineering Notebook
-# Day 1: 2-27
+# Day 1: 4-4
 - Preface: We wrote our last project in C++, which was good for writing our own code but wasn't good for linking gRPC and running it, since we had to deal with cmake and incomplete/non-existent documentation.
 - Although we aren't using any libraries this time, we decided to write the project in Python since Albert and Dean aren't as familiar with C++ and this is a shorter term project (much smaller code size as well). We also wanted to see how using Python compared to using C++, and overall we liked how Python's strengths as a language in general (concise, readable, fast to write, etc.) were reflected in the project.
 - This day, we just got familiar with sockets in Python and sketched out exactly what it was we needed to do for the project (since some of the details weren't so clear).
 - We decided to have three peers connect to each other using sockets (using a pre-defined ordering and ports), with threads designated to reading from the sockets on each VM (virtual machine), otherwise nothing too special. All the other details were essentially decided by the project spec, so there's not much to note there.
 
-# Day 2: 3-1
+# Day 2: 4-6
+- Just pickle [names, name_message_map, ip_address, servers, timestamp]
 - We reviewed the content from class about logical clocks. 
 - We basically finished the server code this day. There were some issues getting the ordering to work correctly, involving a while True loop that would repeatedly attempt to connect the servers to each other if a connection failed (if, for example, one of the forked processes ran in the wrong order, this would lead to a failed connection).
 - We added color-coding to the terminal output to make it easier to read and understand which VM is sending/receiving messages. This was helpful for checking our code and debugging, especially for network related code.
 - Otherwise, everything went smoothly. Compared to the first project, the details here are more well-defined, so there's less need for any rewrites. It's also all of our own code, so no need to dive into documentation beyond the pages on Python sockets and threads.
 
-# Day 3: 3-2
+# Day 3: 4-8
 - Project is officially finished, besides unit testing. For unit testing, we are mostly concerned with making sure the logical clocks work correctly and sync up.
 - We also added a random seed to the program, so that we can run the program multiple times and get the same results. This is useful for testing and debugging. 
 - We used this random seed to test our program with different clock rates for each VM. We found that the logical clocks were able to sync up correctly, even with different clock rates, as desired.
 - We then studied and analyzed our program and its logs to do the analysis outlined in the specification, and put it in the below Observations section.
 
-# Day 4: 3-3
+# Day 4: 4-9
 - Unit test was performed on all individual functions in the program, namely, client, server, process_events, send_message, virtual_machine.
 - We wrote these unit tests to make sure that the functions are working as intended. We also ran our code as a whole to make sure that the entire program is working as intended.
 - Instructions for how to run the unit tests are in the `README.md` file.
