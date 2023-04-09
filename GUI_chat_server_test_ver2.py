@@ -5,6 +5,7 @@ import tempfile
 import os
 import time
 import calendar
+# Some information for our own reference:
 # SSH root@134.209.220.140
 # Password: HFY82305791HFY
 # ufw allow 65432 in cloud server
@@ -14,13 +15,13 @@ import calendar
 # the format in which encoding and decoding will occur
 FORMAT = "utf-8"
 
-# Dynamically allocated arrays and dictionarys
+# Dynamically allocated arrays and dictionaries
 # Can be changed into using database
 names = set()
 # Bi-directional mapping between socket and name 
 conn_name_map = dict()
 name_conn_map = dict()
-# Message buffer for not logged-in but registeredusers
+# Message buffer for not logged-in but registered users
 name_message_map = dict() # A map from a username to a list of messages
 # keep track of registered users and their state of connectedness
 name_loggedin = dict()
@@ -44,10 +45,12 @@ def get_timestamp():
     gmt = time.gmtime()
     return calendar.timegm(gmt)
 
+# Package data into a list that we can store in a database
 def package_data():
     timestamp = get_timestamp()
     return [names, name_message_map, ip_address, servers, timestamp]
 
+# Load data from the database into Python variables we can use 
 def unpackage_data(db, update_servers=False):
     global names
     global name_message_map
@@ -61,7 +64,7 @@ def unpackage_data(db, update_servers=False):
         servers = db[3]
     last_written_timestamp = db[4]
 
-
+# Update the database with the current state of the server under the file corresponding to the name of this server in an atomic manner to prevent race conditions
 def updateDatabase(updateTimestamp=True):
     global last_written_timestamp
     saved_data = package_data()
@@ -83,17 +86,19 @@ def updateDatabase(updateTimestamp=True):
             last_written_timestamp = saved_data[4]
     db_lock.release()
 
+# Try to load the database from the file corresponding to the name of this server if it exists, otherwise do nothing
 def loadDatabase():
     try:
         with open(f"files/serverdb{server_name}.pickle", "rb") as database_file:
             db = pickle.load(database_file)
             print("loaded: ", db)
             unpackage_data(db, update_servers=True)
+    # If the file doesn't exist, we don't need to do anything, and we can just start with an empty database
     except Exception as e:
         print("could not load database: ", str(e))
         pass
 
-# Start the connection
+# Start up the server, making it handle the connection with the clients
 def runServer(SERVER: str, server_socket: socket.socket):
     print("server is working on IP " + SERVER)
     server_socket.listen()
@@ -135,7 +140,7 @@ def runServer(SERVER: str, server_socket: socket.socket):
         thread = threading.Thread(target=serve_client,
                                 args=(conn, addr))
         thread.start()
-        # This is to print out the number of clients online and also for debugging such as broken pipe error and bad fiel descriptor
+        # This is to print out the number of clients online and also for debugging such as broken pipe error and bad file descriptor
         print(f"number of connections is {threading.activeCount()-1}")
 
 # receive incoming messages and send to specified recipients
@@ -207,8 +212,7 @@ def serve_client(conn: socket.socket, addr):
     # We don't really have to return but this is for extended unit test concerns
     # return "serve_client_CLOSED"
 
-# method for broadcasting
-# messages to the each clients / specific client
+# method for broadcasting messages to all the clients or to a specific client, respectively
 
 def broadcastMessageAll(message):
     for conn in name_conn_map.copy().values():
@@ -278,6 +282,7 @@ def send_pickled_data(sock: socket.socket):
     sock.sendall(serialized_data)
     sock.send("FINISH".encode(FORMAT))
 
+# Make server listen to the other servers/replicas and update its database accordingly to the latest information
 def server_listen(address: str, port: int) -> None:
     sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR, 1)
@@ -292,8 +297,9 @@ def server_listen(address: str, port: int) -> None:
             if last_written_timestamp is None or int(timestamp) > last_written_timestamp:
                 print("Timestamp received: ", timestamp)
                 print("Updating database...")
+                # Request data from other servers/replicas so this server can update its database
                 conn.send("REQUEST".encode(FORMAT))
-                conn.recv(4096) # wait for ack
+                conn.recv(4096) # wait for ack, ack means "acknowledgement"
                 print("Updating database...")
                 data = receive_pickled_data(conn)
                 unpackage_data(data)
@@ -308,6 +314,7 @@ def server_listen(address: str, port: int) -> None:
                 print("Sending information...")
                 send_pickled_data(conn)
                 conn.recv(4096) # get ack
+            # Maintain connection with other servers/replicas by sending heartbeats
             while True:
                 try:
                     time.sleep(2)
@@ -323,6 +330,7 @@ def server_listen(address: str, port: int) -> None:
         except Exception as e:
             print("Error listening to another server: ", str(e))
 
+# Make server connect to the other servers/replicas and update them or update from them accordingly
 def server_connect(address: str, port: int) -> None:
     sock = None
     while True:
@@ -335,12 +343,15 @@ def server_connect(address: str, port: int) -> None:
             sock.send(str(last_written_timestamp).encode(FORMAT))
             response = sock.recv(4096).decode(FORMAT)
             print("Response received: ", response)
+            # ack means "acknowledgement"
             sock.send("ACK".encode(FORMAT))
             print("Sent ACK")
+            # Send data to other servers/replicas so they can update their database if requested
             if response == "REQUEST":
                 print("Sending information...")
                 send_pickled_data(sock)
                 sock.recv(4096) # get ack
+            # otherwise, receive data from other servers/replicas and update this server's database
             else:
                 print("Receiving information...")
                 data = receive_pickled_data(sock)
@@ -348,6 +359,7 @@ def server_connect(address: str, port: int) -> None:
                 updateDatabase()
                 print("Sending ACK (OK)")
                 sock.send("OK".encode(FORMAT))
+            # Maintain connection with other servers/replicas by sending heartbeats
             while True:
                 try:
                     time.sleep(2)
@@ -368,6 +380,7 @@ def server_connect(address: str, port: int) -> None:
 if __name__ == "__main__":
     server_name = input("What is this server's name/identity?: ")
 
+    # Try to load the database from the file corresponding to this server's name
     loadDatabase()
     PORT = 65432
     SERVER = None
@@ -382,8 +395,10 @@ if __name__ == "__main__":
         if SERVER == "":
             SERVER = ip_address
 
+    # Prints an empty list if this is the first time running the server
     print(f"The following servers and ports are on record: {servers}")
 
+    # Connect this server to other servers/replicas if they exist right now
     while True:
         other_address = input("Please enter the IP of another existing server, or type nothing to stop: ")
         if other_address == "":
