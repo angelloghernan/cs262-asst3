@@ -3,9 +3,9 @@ import socket
 import threading
 from typing import List
 from tkinter import *
-# from chat import *
 PORT = 65432
 server = "localhost"
+# Some information for our own reference:
 # server = "127.0.1.1"
 # server = "134.209.220.140"
 # Albert IP: 10.250.35.148

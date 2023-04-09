@@ -5,6 +5,7 @@ import tempfile
 import os
 import time
 import calendar
+# Some information for our own reference:
 # SSH root@134.209.220.140
 # Password: HFY82305791HFY
 # ufw allow 65432 in cloud server
