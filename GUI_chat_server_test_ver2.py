@@ -116,7 +116,7 @@ def runServer(SERVER: str, server_socket: socket.socket):
         name = conn.recv(1024).decode(FORMAT)
 
         # Process and update all informations
-        names.update(name)
+        names.update([name])
         conn_name_map.update({conn:name})
         name_conn_map.update({name:conn})
         name_loggedin.update({name:1})
@@ -192,6 +192,8 @@ def serve_client(conn: socket.socket, addr):
             else:
                 # broadcastMessageAll(message)
                 broadcastMessageFromTo(sender_name,message,recipient_name)
+            updateDatabase()
+
         except BrokenPipeError:
             connected = False
         except KeyboardInterrupt:
@@ -215,6 +217,7 @@ def serve_client(conn: socket.socket, addr):
 # method for broadcasting messages to all the clients or to a specific client, respectively
 
 def broadcastMessageAll(message):
+    print("again?")
     for conn in name_conn_map.copy().values():
         try:
             conn.send(message)
@@ -228,8 +231,8 @@ def broadcastMessageAll(message):
 def broadcastMessageFromTo(sender,message,name):
     decoded_message = message.decode(FORMAT)
     if(decoded_message != ''): # We don't allow empty message
-        if(name in name_loggedin.keys() and name in names): # If the name has appeared before
-            if(name_loggedin[name] == 1): # If the user is logged in
+        if name in names: # If the name has appeared before
+            if(name in name_loggedin.keys() and name_loggedin[name] == 1): # If the user is logged in
                 name_conn_map[name].send(message) # Then just directly send the message
             else:
                 if(name not in name_message_map.keys()):
@@ -249,7 +252,7 @@ def broadcastMessageFromTo(sender,message,name):
             name_conn_map[sender].send(message)
             print("message buffer:",name_message_map)
         else: # We are trying to message someone who doesn't exist
-            non_existence_message = "The user you are trying to reach doesn't exist"
+            non_existence_message = "The user you are trying to reach does not exist"
             name_conn_map[sender].send(non_existence_message.encode(FORMAT))
             return non_existence_message
 

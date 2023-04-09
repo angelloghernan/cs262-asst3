@@ -5,7 +5,7 @@ from typing import List
 from tkinter import *
 # FOR USER: change the server IP to the IP of the server you are using, and the port to the port you are using. By default PORT = 65432 should work. 
 PORT = 65432
-server = "localhost"
+server = "10.250.36.224"
 # Some information for our own reference:
 # server = "127.0.1.1"
 # server = "134.209.220.140"
@@ -20,9 +20,10 @@ active_server = 0
 # Some information for our own reference:
 # Albert's Window's laptop IP: "10.250.2.71"
 # Gianni's Laptop IP: "10.250.36.224"
-servers = ["10.250.2.71", "10.250.36.224"] # FOR USER: change this for the demo and whatnot. should have 2 servers
-servers = ["10.250.35.148"]
-servers = ["10.250.2.71", "10.250.35.148"] 
+# servers = ["10.250.2.71", "10.250.36.224"] # FOR USER: change this for the demo and whatnot. should have 2 servers
+# servers = ["10.250.35.148"]
+# servers = ["10.250.2.71", "10.250.35.148"] 
+servers = ["10.250.36.224"]
 sockets: List[socket.socket] = []
 
 for server in servers:
