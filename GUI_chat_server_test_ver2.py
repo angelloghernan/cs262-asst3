@@ -33,7 +33,7 @@ servers = []
 server_sockets = []
 server_name = ""
 
-last_written_timestamp = None
+last_written_timestamp = 0
 
 db_lock: threading.Lock = threading.Lock()
 
@@ -284,6 +284,8 @@ def send_pickled_data(sock: socket.socket):
 
 # Make server listen to the other servers/replicas and update its database accordingly to the latest information
 def server_listen(address: str, port: int) -> None:
+    global last_written_timestamp
+
     sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR, 1)
     sock.bind((address, port))
@@ -293,7 +295,8 @@ def server_listen(address: str, port: int) -> None:
             conn, _ = sock.accept()
             # First message: timestamp, sent by other end
             timestamp = conn.recv(1024).decode(FORMAT)
-            timestamp = 0 if timestamp == None else int(timestamp)
+            timestamp = 0 if timestamp is None else int(timestamp)
+
             if last_written_timestamp is None or int(timestamp) > last_written_timestamp:
                 print("Timestamp received: ", timestamp)
                 print("Updating database...")
