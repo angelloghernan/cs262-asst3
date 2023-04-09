@@ -268,7 +268,7 @@ def exhaust_name_message_map(name, conn): # Conn is the socket
 # and then by reading the amount of bytes in the message
 def receive_pickled_data(sock: socket.socket):
     received_data = b''
-    size = int(sock.recv(4096).decode(FORMAT))
+    size = int(sock.recv(8))
     while len(received_data) < size:
         received_data += sock.recv(4096)
     return pickle.loads(received_data)
@@ -278,7 +278,8 @@ def receive_pickled_data(sock: socket.socket):
 def send_pickled_data(sock: socket.socket):
     data = package_data()
     serialized_data = pickle.dumps(data)
-    sock.send(str(len(serialized_data)).encode(FORMAT))
+    # assume we aren't going over 64 bits worth of space
+    sock.send(len(serialized_data).to_bytes(), 8)
     sock.sendall(serialized_data)
     sock.send("FINISH".encode(FORMAT))
 
