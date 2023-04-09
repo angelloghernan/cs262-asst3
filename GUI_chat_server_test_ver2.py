@@ -284,6 +284,7 @@ def send_pickled_data(sock: socket.socket):
     sock.sendall(serialized_data)
     sock.send("FINISH".encode(FORMAT))
 
+# Make server listen to the other servers/replicas and update its database accordingly to the latest information
 def server_listen(address: str, port: int) -> None:
     sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR, 1)
@@ -299,8 +300,9 @@ def server_listen(address: str, port: int) -> None:
                 timestamp = int(timestamp)
                 print("Timestamp received: ", timestamp)
                 print("Updating database...")
+                # Request data from other servers/replicas so this server can update its database
                 conn.send("REQUEST".encode(FORMAT))
-                conn.recv(4096) # wait for ack
+                conn.recv(4096) # wait for ack, ack means "acknowledgement"
                 print("Updating database...")
                 data = receive_pickled_data(conn)
                 unpackage_data(data)
@@ -315,6 +317,7 @@ def server_listen(address: str, port: int) -> None:
                 print("Sending information...")
                 send_pickled_data(conn)
                 conn.recv(4096) # get ack
+            # Maintain connection with other servers/replicas by sending heartbeats
             while True:
                 try:
                     time.sleep(2)
@@ -330,6 +333,7 @@ def server_listen(address: str, port: int) -> None:
         except Exception as e:
             print("Error listening to another server: ", str(e))
 
+# Make server connect to the other servers/replicas and update them or update from them accordingly
 def server_connect(address: str, port: int) -> None:
     sock = None
     while True:
@@ -342,12 +346,15 @@ def server_connect(address: str, port: int) -> None:
             sock.send(str(last_written_timestamp).encode(FORMAT))
             response = sock.recv(4096).decode(FORMAT)
             print("Response received: ", response)
+            # ack means "acknowledgement"
             sock.send("ACK".encode(FORMAT))
             print("Sent ACK")
+            # Send data to other servers/replicas so they can update their database if requested
             if response == "REQUEST":
                 print("Sending information...")
                 send_pickled_data(sock)
                 sock.recv(4096) # get ack
+            # otherwise, receive data from other servers/replicas and update this server's database
             else:
                 print("Receiving information...")
                 data = receive_pickled_data(sock)
@@ -355,6 +362,7 @@ def server_connect(address: str, port: int) -> None:
                 updateDatabase()
                 print("Sending ACK (OK)")
                 sock.send("OK".encode(FORMAT))
+            # Maintain connection with other servers/replicas by sending heartbeats
             while True:
                 try:
                     time.sleep(2)
