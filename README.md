@@ -3,11 +3,9 @@ This file also contains our Engineering Notebook, which is the last section.
 # Usage
 ## Notes for live demo purposes
 - Need to type "CR [username]" to send message specifically to [username] (which will get delivered once [username] logs in) instead of broadcasting messages to everyone (which are not delivered when [username] logs in).
-- Use "t9a" server to show persistence of messages between a and b.
-- port 63333
-- t10a on 10.250.35.148, t10b on 10.250.44.100, 
-servers = ["10.250.44.100", "10.250.35.148"]
-- t13a t13b
+- Use "t9a" server to show persistence of messages between a and b on a single server.
+- Use "t13a" and "t13b" servers (port 63333, t13a on 10.250.35.148, t13b on 10.250.44.100) to show persistence of messages and replication between a and b on two servers.
+- Use t15a and higher nums for live demoing.
 
 
 
