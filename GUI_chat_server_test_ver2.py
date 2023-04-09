@@ -66,7 +66,7 @@ def unpackage_data(db, update_servers=False):
         servers = db[4]
     last_written_timestamp = db[5]
 
-# Update the database with the current state of the server under the file serverdb{server_name}.pickle in an atomic manner to prevent race conditions
+# Update the database with the current state of the server under the file corresponding to the name of this server in an atomic manner to prevent race conditions
 def updateDatabase(updateTimestamp=True):
     global last_written_timestamp
     saved_data = package_data()
@@ -88,6 +88,7 @@ def updateDatabase(updateTimestamp=True):
             last_written_timestamp = saved_data[5]
     db_lock.release()
 
+# Load the database from the file corresponding to the name of this server
 def loadDatabase():
     try:
         with open(f"files/serverdb{server_name}.pickle", "rb") as database_file:
