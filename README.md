@@ -1,3 +1,5 @@
+This file also contains our Engineering Notebook, which is the last section. 
+
 # Usage
 ## Chat features
 The information from design project 1 on how to perform the chat features like creating accounts and listing accounts, etc., is found in `original_chat_app_readme.txt`. That information is not relevant to this specific design project 3, so we did not include it here.
