@@ -1,6 +1,10 @@
 This file also contains our Engineering Notebook, which is the last section. 
 
 # Usage
+## Notes for live demo purposes
+- Need to type "CR [username]" to send message specifically to [username] (which will get delivered once [username] logs in) instead of broadcasting messages to everyone (which are not delivered when [username] logs in).
+- Use "t9a" server to show persistence of messages between a and b.
+
 ## Chat features
 The information from design project 1 on how to perform the chat features like creating accounts and listing accounts, etc., is found in `original_chat_app_readme.txt`. That information is not relevant to this specific design project 3, so we did not include it here.
 
