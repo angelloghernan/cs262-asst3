@@ -3,6 +3,7 @@ import socket
 import threading
 from typing import List
 from tkinter import *
+# FOR USER: change the server IP to the IP of the server you are using, and the port to the port you are using. By default PORT = 65432 should work. 
 PORT = 65432
 server = "localhost"
 # Some information for our own reference:
