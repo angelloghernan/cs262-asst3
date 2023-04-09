@@ -401,6 +401,7 @@ if __name__ == "__main__":
     # Prints an empty list if this is the first time running the server
     print(f"The following servers and ports are on record: {servers}")
 
+    # Connect this server to other servers/replicas if they exist right now
     while True:
         other_address = input("Please enter the IP of another existing server, or type nothing to stop: ")
         if other_address == "":

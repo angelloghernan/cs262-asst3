@@ -17,9 +17,10 @@ format = "utf-8"
 
 active_server = 0
 
+# Some information for our own reference:
 # Albert's Window's laptop IP: "10.250.2.71"
 # Gianni's Laptop IP: "10.250.36.224"
-servers = ["10.250.2.71", "10.250.36.224"] # NOTE: change this for the demo and whatnot. should have 2 servers
+servers = ["10.250.2.71", "10.250.36.224"] # FOR USER: change this for the demo and whatnot. should have 2 servers
 servers = ["10.250.35.148"]
 sockets: List[socket.socket] = []
 
@@ -207,6 +208,7 @@ class Client:
                 # an error will be printed on the command line or console if there's an error
                 client.send("DIE".encode(format))
             except Exception:
+                # if there's an error, we assume the server is down. Then, we switch servers to a working one, so that we are 2-fault tolerant in the face of crash/failstop failures.
                 # naively round robin to the next server as the active server if this server is down
                 if active_server == server_no:
                     active_server += 1
