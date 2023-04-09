@@ -22,6 +22,7 @@ active_server = 0
 # Gianni's Laptop IP: "10.250.36.224"
 servers = ["10.250.2.71", "10.250.36.224"] # FOR USER: change this for the demo and whatnot. should have 2 servers
 servers = ["10.250.35.148"]
+servers = ["10.250.2.71", "10.250.35.148"] 
 sockets: List[socket.socket] = []
 
 for server in servers:

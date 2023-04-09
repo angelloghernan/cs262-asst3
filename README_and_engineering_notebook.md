@@ -55,7 +55,7 @@ We fully implemented the specification on Canvas. We created a simulation of a s
 
 Each clock cycle, a machine reads its pending messages from its queue (if any) and updates its logical clock based on the logical clock number it has received from  neighboring machines. If there are none pending, it randomly may either send a message to one of the machines or both or update its own logical clock internally.
 
-See `engineering_notebook.md` for more details on the decision-making process simulation design and its results.
+See "Engineering Notebook" section below for more details on the decision-making process and design.
 
 
 # Testing
