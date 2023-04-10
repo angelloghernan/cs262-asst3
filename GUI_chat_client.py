@@ -18,12 +18,13 @@ format = "utf-8"
 active_server = 0
 
 # Some information for our own reference:
-# Albert's Window's laptop IP: "10.250.2.71"
+# Albert's Macbook's laptop IP: "10.250.35.148"
 # Gianni's Laptop IP: "10.250.36.224"
 servers = ["10.250.2.71", "10.250.36.224"] # FOR USER: change this for the demo and whatnot. should have 2 servers
 servers = ["10.250.35.148"]
 # servers = ["10.250.2.71", "10.250.35.148"] 
 servers = ["10.250.44.100", "10.250.35.148"]
+servers = ["10.250.35.148", "10.250.36.224"]
 # servers = ["10.250.44.100"]
 sockets: List[socket.socket] = []
 
